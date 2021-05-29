@@ -1,0 +1,228 @@
+---
+title: "ST558-651 Homework 4"
+author: "James Carr"
+date: "5/24/2021"
+output: 
+  html_document:
+    toc: TRUE
+    toc_float: TRUE
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(knitr)
+```
+
+### Number 1
+*Create a function called* **count_my_change**
+*5 arguments for dollar, qtr, dime, nickel, and penny. all default 0* 
+```{r num1}
+count_my_change <- function(dollar=0, quarter=0, dime=0, 
+                            nickel=0, penny=0) {
+  change <- (dollar + quarter * 0.25 + dime * 0.10 + 
+          nickel * 0.05 + penny * 0.01)
+  str <- paste('Your total is $', change, sep='')
+  return (str)
+}
+count_my_change(1)
+count_my_change(1, 1, 1, 1, 1)
+count_my_change(1, 2, 3, 4, 5)
+```
+The function, count_my_change, appears be counting the money and outputting the value to a sentence correctly.
+
+### Number 2
+*Explain what the difference is between an infix and prefix function.* <br>
+With a prefix conversion, the operator comes before the operands. In an infix, the operator is between the operands.
+
+
+### Number 3
+*Write your own infix function to replace cbind*
+```{r num3}
+`%add_cols%` <- function(col1, col2) {
+  both_cols <- cbind(col1, col2)
+  return(both_cols)
+}
+
+#the following columns were provided to be tested
+df1 <- data.frame(unif = runif(10), norm = rnorm(10))
+df2 <- data.frame(gamma = rgamma(10, shape = 1), beta = rbeta(10, shape1 = 5, shape2 = 1))
+vec1 <- rnorm(10, mean = 10)
+
+df1
+df2
+df1 %add_cols% df2
+
+vec1
+df1 %add_cols% df2 %add_cols% vec1
+```
+It seems to have worked. There are now 5 columns, 2 from each data frame and the 5th from the vector. The vector does not have a name, so it is given the name col2, which is the temporary variable it was passed in. 
+
+### Problem 4
+*Create a function that returns the interquartile range*
+*Remove name on the returned vector*
+*Allow arguments to be passed to quantile function*
+*Verify if numeric, confirm either 1 column or a vector*
+```{r num4, error=TRUE}
+getIQR <- function(vector, ...) {
+  #if dataframe with 1 column, extract vector
+  #if not a dataframe, and not a vector, then throw error
+  if (is.vector(vector)) {
+    temp_vec <- vector
+  } else if (is.data.frame(vector) & ncol(vector) == 1) {
+    if (is_tibble(vector)) {
+      temp_vec <- pull(vector[,1]) #extract from tibble
+    } else {
+      temp_vec <- vector[,1] #extract from data frame
+    }
+  } else {
+    stop('This function only accepts a numeric column of data.')
+  }
+  
+  #if we're here, we have a vector
+  #check if numeric
+  if (!is.numeric(temp_vec)) {
+    stop('This function only accepts a numeric column of data.')
+  }
+  
+  #at this point the variable vector is a numeric vector
+  #run quantiles, add options provided by user, remove names, return
+  iqr <- unname(quantile(temp_vec, c(0.25, 0.5, 0.75), ...))
+  
+  #return vector for chaining
+  invisible(vector)
+  
+  #return interquantiles
+  return(iqr)
+}
+
+tbl1 <- tibble(c(1, 2, 3, 4, 5))
+df3 <- data.frame(c(1, 2, 3, 4, 5))
+vec2 <- c(1, 2, 3, 'c')
+getIQR('a') #error because it's not numeric
+getIQR(df1) # should throw error 2 columns
+getIQR(df3) #1 column dataframe - should run
+getIQR(tbl1) #1 column tibble - should run
+getIQR(vec1) #numeric vector - should run
+getIQR(vec2) #non-numeric vector, should throw error
+```
+The tests above appear to have worked. Data frames/tibbles with more than two columns throw an error. Non-numeric data throws an error as well. 
+
+### Number 5
+*Read in titanic data and run w/ function created above*
+*must work with NAs and tibbles *
+```{r num5, error=TRUE}
+titanicData <- readr::read_csv("https://www4.stat.ncsu.edu/~post/ST558/datasets/titanic.csv")
+
+#check iqr (don't remove NAs first)
+getIQR(titanicData$age) #expecting error due to NAs
+getIQR(titanicData$age, na.rm = TRUE) #should run
+getIQR(select(titanicData, age), na.rm = TRUE) #should run
+getIQR(select(titanicData, fare), na.rm = TRUE) #should run
+
+iqr_tbl <- rbind(getIQR(select(titanicData, age), na.rm = TRUE),
+                 getIQR(select(titanicData, fare), na.rm = TRUE))
+colnames(iqr_tbl) <- c('25%', '50%', '75%')
+rownames(iqr_tbl) <- c('Age', 'Fare')
+```
+Similarly, the data frames are handled correct, and NAs are appropriately handled when na.rm is passed to the function. The IQR for age and fare are show in this table: <br>
+`r kable(iqr_tbl, digits=2)`
+
+### Number 6
+*Write a function getCoefVar that returns sample coef of var*
+*allow unnamed args to be passed to sd and mean*
+*check named args passed are valid*
+```{r num6, error=TRUE}
+getCoefVar <- function(data, ...) {
+  #if dataframe with 1 column, extract vector
+  #if not a dataframe, and not a vector, then throw error
+  if (is.vector(data)) {
+    temp_vec <- data
+  } else if (is.data.frame(data) & ncol(data) == 1) {
+    if (is_tibble(data)) {
+      temp_vec <- pull(data[,1]) #extract from tibble
+    } else {
+      temp_vec <- data[,1] #extract from data frame
+    }
+  } else {
+    stop('This function only accepts a numeric column of data.')
+  }
+  
+  #if we're here, we have a vector
+  #check if numeric
+  if (!is.numeric(temp_vec)) {
+    stop('This function only accepts a numeric column of data.')
+  }
+  
+  #at this point the variable vector is a numeric vector
+  #get coef of variation
+  #add options provided by user
+  coef <- sd(temp_vec, ...) / abs(mean(temp_vec, ...)) 
+  
+  #return data for chaining
+  invisible(data)
+  
+  #return interquantiles
+  return(coef)
+}
+
+#testing
+getCoefVar('a') #error because it's not numeric
+getCoefVar(df1) # should throw error 2 columns
+getCoefVar(df3) #1 column dataframe - should run
+getCoefVar(tbl1) #1 column tibble - should run
+getCoefVar(vec1) #numeric vector - should run
+getCoefVar(vec2) #non-numeric vector, should throw error
+
+```
+This function was tested with similar methods as the previous function. All tests passed.
+
+### Number 7
+*Use on same titanic data again*
+*verify NA and tibble handling*
+```{r num7, error=TRUE}
+#check coefVar (don't remove NAs first)
+getCoefVar(titanicData$age) #expecting NA due to NAs
+getCoefVar(titanicData$age, na.rm = TRUE) #should run
+getCoefVar(select(titanicData, age), na.rm = TRUE) #should run
+getCoefVar(select(titanicData, fare), na.rm = TRUE) #should run
+```
+NAs appropriately handled. Age has a Coefficient of Variation of `r round(getCoefVar(select(titanicData, age), na.rm = TRUE), 2)` and fare's Coefficient of Variation is `r round(getCoefVar(select(titanicData, fare), na.rm = TRUE), 2)`.
+
+### Number 8
+*Create a function that returns both coefficient of variation and the IQR*
+```{r num8}
+getSummaries <- function(data, ...) {
+  #get iqr
+  iqr <- getIQR(data, ...)
+  #get Coefficient of Variation
+  coefVar <- getCoefVar(data, ...)
+  
+  #return data for chaining
+  invisible(data)
+  
+  #return in list form for proper naming
+  return (list(iqr = iqr, coefVar = coefVar))
+}
+```
+The function uses the previously created functions and returns the IQR and Coefficient of Variation in a list (so the list has two objects).
+
+### Number 9
+*Run the 2 columns of titanic data through the new function*
+```{r num9}
+age <- getSummaries(titanicData$age, na.rm = TRUE)
+fare <- getSummaries(titanicData$fare, na.rm = TRUE)
+
+summaries <- rbind(c(age$iqr, age$coefVar),
+                   c(fare$iqr, fare$coefVar))
+colnames(summaries) <- c('25%', '50%', '75%', 'Coef')
+rownames(summaries) <- c('Age', 'Fare')
+
+```
+Now, with the combined function, we get the following values for age and fare:
+`r kable(summaries, digits=2)`
+These match the previous values.
+
+### Number 10
+*Why can you name a value sd in a function and not cause any issues with the sd function* <br>
+Our functions are stored in the global environment, and the variables within them are temporary. The variable sd is stored in the base environment. 

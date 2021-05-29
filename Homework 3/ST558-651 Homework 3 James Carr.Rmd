@@ -1,0 +1,107 @@
+---
+title: "ST558-651 Homework 3"
+author: "James Carr"
+date: "5/23/2021"
+output: 
+  html_document:
+    toc: TRUE
+    toc_float: TRUE
+    toc_depth: 2
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(Lahman)
+library(knitr)
+library(tidyverse)
+```
+
+
+## Number 1
+##### Print Pitching data as tibble
+```{r print.pitching}
+pitching <- as_tibble(Pitching)
+pitching
+```
+
+## Number 2
+##### Print only columns that end in ID, and W, L, ERA 
+```{r print.filtered}
+pitching %>% select(ends_with('ID'), W, L, ERA)
+```
+
+## Number 3
+##### What is an advantage of using select over base R methods?
+I like that you can easily combine it with other functions in one statement. So I can select the columns, filter the data, sort it, and write that in all in one, quick and understandable statement. It also returns the columns as the tibble data type, where using a dollar-sign returns it as a vector. Though, one of the biggest advantages is in how easy it is to select variables. For instance, selecting variables that end in "ID" or that all start with the same letters. 
+
+## Number 4
+##### Using the code from question 2, select the same fields, but subset on 2010-2015 and arrange them by year as well
+```{r}
+pitching %>% 
+  select(ends_with('ID'), W, L, ERA) %>%
+  filter(yearID >= 2010 & yearID <= 2015) %>%
+  arrange(yearID)
+```
+
+## Number 5
+##### Continuing from the previous problem, create a new variable that is the win percentage
+```{r}
+pitching %>% 
+  select(ends_with('ID'), W, L, ERA) %>%
+  filter(yearID >= 2010 & yearID <= 2015) %>%
+  arrange(yearID) %>%
+  mutate(WinPercent = W / (W+L))
+  
+```
+
+## Number 6
+##### Continuing from the previous problem, sort by win %
+```{r}
+pitching %>% 
+  select(ends_with('ID'), W, L, ERA) %>%
+  filter(yearID >= 2010 & yearID <= 2015) %>%
+  mutate(WinPercent = W / (W+L)) %>%
+  arrange(yearID, desc(WinPercent))
+```
+
+## Number 7
+##### Find ERA avg for each team in this subset, removing NAs. store into a dataset 
+```{r}
+summary_stats <- pitching %>%
+                    select(teamID, yearID, ERA) %>%
+                    na.omit() %>%
+                    filter(yearID >= 2010 & yearID <= 2015) %>%
+                    group_by(teamID, yearID) %>%
+                    summarise(avgERA = mean(ERA))
+           
+```
+
+## Number 8
+##### Transform the data into a wide dataset with the years now as columns
+```{r}
+wider <- summary_stats %>% spread(yearID, avgERA)
+print(wider, n = nrow(wider))
+```
+
+## Number 9
+##### Florida has two names (MIA and FLO). Combine the two into MIA/FLO.
+```{r}
+levels(wider$teamID)[levels(wider$teamID) == "MIA"]  <- "MIA/FLO"
+new_stats <- wider %>% 
+                mutate(teamID = replace(teamID, teamID=='FLO' |
+                                    teamID == 'MIA', 'MIA/FLO')) %>%
+                arrange(teamID) %>%
+                group_by(teamID) %>%
+                summarise_all(sum, na.rm = TRUE)
+                
+kable(new_stats, digits=2)             
+```
+
+## Number 10
+##### Explain coercion. Give examples.
+Coercion is another word for casting. It is changing a data type from one to another (i.e. string to date). An implicit coercion is when the data type is changed because the code you typed requires it, though you didn't necessarily ask for it. Explicit coercion occurs when your your code explicitly asks for it (hence the name). Examples:  
+  
+*  Implicit: `c(1, "Hello")`.  
+    * This has to cast the numeric integer 1 to a string so that it can be merged into a vector with the character string 'Hello'.  
+* Explicit: `as.numeric("2")`. 
+    * Here we've asked the program to convert the string "2" to the number 2.  

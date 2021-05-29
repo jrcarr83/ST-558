@@ -1,0 +1,62 @@
+---
+title: "ST558-651 Homework 2"
+author: "James Carr"
+date: "5/22/2021"
+output:
+  html_document:
+    toc: yes
+    toc_depth: 2
+    toc_float: yes
+  
+urlcolor: blue
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(knitr)
+library(kableExtra)
+```
+
+## Lena{#lena}
+![](lena.png)
+
+### Info {.tabset}
+#### Image Infomration
+This is a *famous image* used in **image processing**. Her name is Lena. For more details, check [this website](https://lemire.me/blog/2017/11/10/should-computer-scientists-keep-the-lena-picture/).
+
+#### References
+* Carole Hersee  
+* Lorem ipsum
+  * filler text  
+  * useful for templates  
+* Shirley cards  
+* Suzanne  
+* Utah teapot  
+* China Girl  
+
+## Iris {-}
+
+### Averages
+The `iris` data set includes infomration about iris flowers. Here are the means for the *Sepal Length* and *Sepal Width* variables using the `mean` and `round` functions:
+
+```{r iris.avg, echo=FALSE}
+avgLength <- round(mean(iris$Sepal.Length), 2)
+avgWidth <- round(mean(iris$Sepal.Width), 2)
+tbl <- as.matrix(cbind(avgLength, avgWidth))
+kable(tbl) %>%
+  kable_styling(latex_options = c("hold_position"))
+```
+
+### Plot Across Years
+The code given here will produce plots of `Sepal.Length` vs `Sepal.Width` for the three **Species**. Note: this uses the `ggplot2` package - part of the `tidyverse`.
+
+```{r iris.plots, warning=FALSE}
+library(ggplot2)
+ggplot(iris, aes(x=Sepal.Length, y=Sepal.Width)) +
+  geom_point() +
+  facet_wrap(~ Species, ncol=2, scales='free')
+
+```
+<br>
+The smallest *Sepal Length* overall is `r min(iris$Sepal.Length)`.
+

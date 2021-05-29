@@ -1,0 +1,105 @@
+---
+title: "ST 558-651 Homework 1"
+author: "James Carr"
+date: "5/22/2021"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Subsetting Vectors
+```{r}
+#creating vector elements 2 to 12 counting by 2
+vec <- seq(2, 12, by=2)
+
+#here we print only the odd indexes
+vec[c(1, 3, 5)]
+
+#print without first element
+vec[-1]
+
+#print without first and third element
+vec[c(-1, -3)]
+
+#print all values but the last value
+vec[-length(vec)]
+
+#save the vector in reverse
+revVec <- rev(vec)
+
+#print first element 5 times
+vec[rep(1, 5)]
+
+```
+
+## Subsetting Matrices
+```{r}
+#matrix w/ 4 rows, 3 cols, of uniform data between 0 and 1
+unifMat <- matrix(runif(12, 0, 1),nrow=4, ncol=3)
+
+#odd rows replaced by 2 times value
+unifMat[c(1, 3),] <- unifMat[c(1, 3),] * 2
+
+#even rows replaced by 1/2 times value
+unifMat[c(2, 4),] <- unifMat[c(2, 4),] * 0.5
+
+#convert vec to matrix and print dimensions
+matVec <- as.matrix(vec)
+dim(matVec)
+
+#using the drop command to subset
+drop_true <- unifMat[1, ,drop=TRUE]
+drop_false <- unifMat[1, ,drop=FALSE]
+```
+Using drop = true seems to return the values as a vector
+
+## Subsetting Data Frames
+```{r}
+#showing 3 ways to access the 4th column of the data set
+names(iris)[4]
+iris$Petal.Width
+iris[,4]
+iris[,"Petal.Width"]
+
+#create extra column whose entrys are all 1s
+iris$Extra.Col <- 1
+
+#printing out mtcars columns in sorted order
+mtcars <- mtcars[,sort(names(mtcars))]
+mtcars
+
+#removing column called Sepal.Width
+iris$Sepal.Width <- NULL
+names(iris)
+
+#replacing all periods in column name with underscores
+names(iris) <- gsub('\\.', '_', names(iris))
+names(iris)
+
+```
+
+## Subsetting Lists
+```{r}
+#creating list 1 and showing 2 ways to access the 2nd element
+lst1 <- list(a = vec, b = revVec, c = unifMat)
+lst1$b
+lst1[[2]]
+
+#creating a 2nd list with list 1 as its only element
+lst2 <- list(lst1)
+#subsetting list 2 to access b in list 1
+lst2[[1]]$b
+
+#test what happens if only using 1 set of square brackets
+test <- lst1[1]
+test2 <- lst1[[1]]
+str(test)
+str(test2)
+test[1]
+test2[1]
+```
+When using only 1 bracket, it returns the vector as a list of 1 and inside of the list of 1 is the element you want to look at. If you use both brackets, it does not return a list of 1, but it returns the element. 
+
+This could be useful if you want to subset a list to combine with another list, I suppose.
