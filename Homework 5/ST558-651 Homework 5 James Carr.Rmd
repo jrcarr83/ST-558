@@ -1,0 +1,154 @@
+---
+title: "ST558-651 Homework 5"
+author: "James Carr"
+date: "5/29/2021"
+output: 
+  html_document:
+    toc: true
+    toc_float: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(knitr)
+library(tidyverse)
+```
+
+## General Questions
+### Question 1
+*What is a delimiter? What is the most common delimiter?*
+A delimiter is a type of character, space, or symbol that gives the user a way to determine which data belongs in which column on each row. The most common delimiter is comma, though pipe delimiters are popular is well. An example of a delimited file would be a file that has a comma at the end of each column on every row.
+
+### Question 2
+*What is an R package? What is the difference between library and require statements?*
+An R package is a collection of functions that a user can install. Though some r packages also include data. They generally come with a help file that describes the package. 
+
+`Library()` will return an error if the package does not exist. `Require()` will only give a warning.
+
+## Deaths Data
+### Question 1
+*Install and load the readx1 package*
+```{r load_readxl}
+library(readxl)
+```
+
+### Question 2
+*Use the readxl package to print out the path to our dataset*
+```{r readxl_xmpl}
+readxl_example()
+readxl_example('deaths.xlsx')
+death_path <- readxl_example('deaths.xlsx')
+```
+The excel workbook has two tabs: arts and other. Both have text above the data, so the first few rows need to be omitted when reading in. There is also text after the data which needs to be ignored. Also, the column names have spaces, but I'm not sure that's necessarily a problem in R.
+
+### Question 3
+*Read in the dataset without any extra options*
+```{r deaths_bad}
+bad_deaths <- read_excel(death_path)
+bad_deaths
+```
+The results are better than I would have expected but still bad. It reads in the text before and after the actual data, and the first line becomes the first column's name, and the rest of the columns have no header name.
+
+### Question 4
+*Add the appropriate arguments to read the data in correctly*
+```{r deaths1}
+#the data is 11 rows (including header). need to skip
+#the first 4 rows of nonsense
+deaths1 <- read_excel(path=death_path, skip=4, n_max=10)
+deaths1
+```
+I initially tried using `n_max = 11`, thinking the header would count as a row, but it read in an extra row of data. It was read in as a tibble, and as the print out above shows, it appears to have read in correctly.
+
+### Question 5
+*Read in the other sheet and call it deaths2. Combine with deaths using `rbind` and call it all_deaths*
+```{r deaths2}
+#the 'other' data set has the same # of rows and columns
+#also the same number of rows to be skipped
+deaths2 <- read_excel(path=death_path, skip=4, n_max=10,
+                      sheet='other')
+all_deaths <- rbind(deaths1, deaths2)
+all_deaths
+```
+I wasn't sure if using `rbind` would allow it to stay as a tibble, but it did. We now have 20 rows of data.
+
+## Education Data
+### Question 1
+*Read in the first sheet of censusEd.xlsx*
+```{r census_read}
+#there are 3198 rows of data and 42 cols and there is a header
+census <- read_excel(path='censusEd.xlsx')
+census
+```
+The data read in correctly with no options. I have the excel file in my working directory as well, so no need to add anything extra to the path.
+
+
+### Question 2
+*Filter the census data to the state totals*
+```{r getStates}
+filter(census, toupper(Area_name) %in% toupper(state.name))
+```
+States were successfully filtered. We have 50 rows of data.
+
+### Question 3
+*Filter to the 50 states and columns that end in D*
+*Store in variable named edDataD*
+```{r store_states}
+edDataD <- census %>% 
+            filter(toupper(Area_name) %in% toupper(state.name)) %>%
+            select(Area_name, ends_with('D'))
+edDataD
+```
+States again successfully filtered and stored with only columns ending in D.
+
+### Question 4 
+*Print enrollment stats for 1996 in decreasing order*
+*Show only area_name and the 1996 column*
+```{r top3_1996}
+edDataD %>%
+  select(Area_name, contains('96')) %>%
+  arrange(across(contains('96'), desc))
+```
+The top 3 are California, Texas, and New York. That would seem intuitive to me, as they are large states with big populations.
+
+## Scores Data
+### Question 1
+*Read in the scores.csv data*
+```{r read_scores}
+scores <- read_csv('scoresFull.csv')
+```
+It read in `r nrow(scores)` rows and `r ncol(scores)` columns of data from the csv.
+
+## Religion Data
+### Question 1
+*What type of delimiter is the relig_income.txt file use?*
+It does not appear to be delimited. It could almost be space delimited, but the first column has text with spaces. This would be an annoying dataset to read in so I'm hoping the next question does not ask us to. 
+
+### Question 2
+*Read in the txt data. Does it look right?*
+```{r relig_txt}
+relig <- read_delim(file='relig_income.txt', delim=' ')
+relig
+```
+There were errors when attempting to read in with space delimited, since as noted in the previous question, the first column contains spaces which bleed into the next columns.
+
+### Question 3
+```{r relig_csv}
+relig2 <- read_csv(file='relig_income.csv')
+relig2
+```
+This seems to have gone well, though there are some issues with the apostrophe character. 
+
+### Question 4
+*Rename the <10k column to $0-10k*
+```{r}
+relig2 <- rename(relig2, '$0-10k' = '<$10k')
+```
+Column successfully updated.
+
+### Question 5
+*Print to a long format instead of a wide format*
+```{r}
+relig2 %>% gather('ranges', 'amount', -religion)
+```
+
+
