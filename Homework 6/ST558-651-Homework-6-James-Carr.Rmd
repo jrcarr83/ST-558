@@ -1,0 +1,189 @@
+---
+title: "ST558-651 Homework 6"
+author: "James Carr"
+date: "6/1/2021"
+output: 
+  html_document:
+    toc: true
+    toc_float: true
+    toc_depth: 4
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(knitr)
+```
+
+## Databases
+### Local Databases
+#### Question 1
+*Create connection to google sandbox. Then query a table using dplyr and sql* 
+```{r con_goog, warning=FALSE, message=FALSE}
+library(bigrquery)
+library(DBI)
+con <- dbConnect(bigrquery::bigquery(), project = "publicdata",
+                 dataset = "samples",
+                 billing = "st558-james-carr")
+```
+A list of tables in the connection to the Google sandbox printed using `dbListTables(con)`: <br>
+`r dbListTables(con)`
+
+I think a good exercise would be to determine the number of cigarettes per day by mother birth state (top 10):
+```{r dplyr_goog}
+natality <- tbl(con, 'natality')
+cig_per_day <- natality %>%
+                  select(mother_birth_state, cigarettes_per_day) %>%
+                  group_by(mother_birth_state) %>%
+                  summarise(num_cigs = sum(cigarettes_per_day)) %>%
+                  arrange(desc(num_cigs)) 
+
+```
+Using the `dplyr` function, here is the number of cigarettes per day summarised:
+`r kable(head(cig_per_day, n=10L))`
+
+Now, let's try to get the same results using SQL:
+```{r sql_goog}
+sql_text <- paste('select top 10 *'
+                 ,'from ('
+                        ,'select mother_birth_state'
+                        ,',sum(cigarettes_per_day) as num_cigs'
+                        ,'from natality'
+                        ,'group by other_birth_state'
+                        ,'order by num_cigs desc)'
+                 ,sep=' ')
+
+sql_text <- paste('select mother_birth_state'
+                 ,      ',sum(cigarettes_per_day) as num_cigs'
+                 ,'from natality'
+                 ,'group by mother_birth_state'
+                 ,'order by num_cigs desc'
+                 ,'limit 10'
+                 ,sep=' ')
+cig_per_day <- dbGetQuery(con, sql_text)
+
+```
+Using `sql`, here is the number of cigarettes per day summarised:
+`r kable(cig_per_day)`
+
+The results are exactly the same as the `dplyr` function, which is what we were hoping for.
+
+### Local Database
+#### Question 2
+*Query the local db to return playlists and playlist_track tables*
+*Store them as pl and pl_tracks*
+*How many playlists in the database?* 
+```{r local_db, warning=FALSE, message=FALSE}
+library(RSQLite)
+db <- dbConnect(RSQLite::SQLite(), "chinook.db")
+db_tbls <- dbListTables(db)
+pl <- tbl(db, 'playlists') %>% collect()
+pl_tracks <- tbl(db, 'playlist_track') %>% collect()
+```
+The code above successfully connects to a local database within the working directory. The playlist table contains `r nrow(pl[1])` playlists.
+
+#### Question 3
+*Inner join pl and pl_tracks. Freq table on tracks w/ playlist name* 
+```{r join}
+pl_join <- inner_join(pl, pl_tracks, by='PlaylistId')
+pl_tbl <- pl_join %>%
+            count(Name) %>%
+            rename('Frequency' = 'n') 
+```
+Using a `dplyr` inner join on PlaylistId yields the following frequency table: 
+`r kable(pl_tbl)`
+
+#### Question 4
+*Read in tracks and albums and store them* 
+```{r tracks}
+tracks <- tbl(db, 'tracks') %>% collect()
+albums <- tbl(db, 'albums') %>% collect()
+```
+Tracks and Albums read in and stored. Tracks has `r ncol(tracks)` variables and albums has `r ncol(albums)` variables.
+
+#### Question 5
+*Filter pl_join to Grunge (LETS GOOO), left join w/ tracks* 
+```{r grunge}
+grunge <- pl_join %>% filter(Name == 'Grunge')
+grunge_join <- left_join(grunge, tracks, by='TrackId')
+```
+Below is the table of grunge left joined with tracks. It contains `r ncol(grunge_join)`, since it combines tracks which has `r ncol(tracks)` columns, and grunge which contains `r ncol(grunge)` - and they have 1 column in common which is used to join. It appears all trackIds in grunge have a corresponding track, as there are no nulls. And of course, it has `r nrow(grunge_join)` rows since we took a left join of grunge which has `nrow(grunge)` rows as well. However, both the playlist and the track are called 'Name', leading to a bit of a conflict.
+`r (kable(grunge_join))`
+
+#### Question 6
+*Rename the conflicting columns* 
+```{r rename_cols}
+grunge <- grunge %>% rename('PlaylistName' = 'Name')
+tracks <- tracks %>% rename('TrackName' = 'Name')
+grunge_join <- left_join(grunge, tracks, by='TrackId')
+```
+After renaming the variables, the conflict no longer exists: 
+`r (kable(grunge_join))`
+
+#### Question 7
+*Disconnect from the database* 
+```{r disco}
+dbDisconnect(db) #disconnect from local db
+dbDisconnect(con) #disocnnect from server db
+```
+Disconnected from the local and server database.
+
+## Querying an API
+#### Question 1
+*Install and load jsonlite and httr* 
+```{r load_stuff, warning=FALSE, message=FALSE}
+library(httr)
+library(jsonlite)
+```
+Libraries loaded.
+
+#### Question 2
+*look at documentation https://pokeapi.co/docs/v2* 
+*what are some tables we can access?* 
+Tables we can access are:
+* Berries
+* Berry Firmnesses
+* Berry Flavors
+* Contest Types
+* Contest Effects
+* Super Contest Effects
+* etc (it appears to be a long list)
+
+#### Question 3
+*Pull pikachu attribute from the pokemon table* 
+```{r get_pikachu}
+base_url <- 'https://pokeapi.co/api/v2'
+tbl <- 'pokemon'
+pokemon <- 'pikachu'
+full_url <- paste0(base_url, '/', tbl, '/', pokemon)
+```
+After constructing the full url, we should be able to access the API: 
+`r full_url`
+
+#### Question 4
+*Use get to get data in raw form* 
+*Use content to turn into json form* 
+*Convert it to a list using fromJSON* 
+```{r pikachu_scrape}
+poke_raw <- httr::GET(url=full_url)
+poke_con <- httr::content(poke_raw)
+poke_list <- jsonlite::fromJSON(full_url, flatten=TRUE)
+```
+Currently, my json list is of length `r length(poke_list)`, so hopefully they've added a new pikachu since this homework was created?!? According to homework documentation, 17 expected.
+
+#### Question 5
+*How many moves can pikachu do?* 
+The documentation lists `r length(poke_list$moves$move.name)` moves that pikachu can do.
+
+#### Question 6
+*Which games/versions is pikachu in?* 
+```{r pika_games}
+pika_games <- poke_list$game_indices %>%
+                select(game_index, version.name) %>%
+                group_by(game_index, version.name)
+```
+Pikachu is apparently in the following games and versions:
+`r kable(pika_games, align=c('c', 'c'))`
+
+
+
