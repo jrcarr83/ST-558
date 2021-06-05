@@ -1,0 +1,120 @@
+---
+title: "ST558-651 Homework 7 Part 2"
+author: "James Carr"
+date: "6/3/2021"
+output: 
+  html_document:
+    toc: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(knitr)
+library(tidyverse)
+```
+
+# Iris Data Set
+## Introduction
+The **Iris flower data set** or **Fisher’s Iris data set** is a multivariate data set introduced by the British statistician and biologist Ronald Fisher in his 1936 paper *The use of multiple measurements in taxonomic problems* as an example of [linear discriminant analysis](https://en.wikipedia.org/wiki/Linear_discriminant_analysis). 
+![](fisher.jpg)
+
+`r kable(head(iris, n=6L), caption='Preview of Iris Data')`
+
+## Numeric Summaries by Species
+In regards to sepal length, virginica is the largest with versicolor being comparable. However, setosa has the biggest sepal width. Setosa is easily the smallest in petal, with virginica being largest in petal length and width.
+
+```{r iris_agg, echo=FALSE, warning=FALSE, message=FALSE}
+#function takes tibble
+#filters on species 
+#returns a tibble of summary stats 
+#probably did this wrong but couldn't figure out 
+#how to extract summary stats from summary()
+species_stats <- function(data, species) {
+    data <- data %>% 
+          filter(Species==species) %>% na.omit() %>%
+          select(-Species) %>%
+          pivot_longer(cols=everything(),names_to='key') %>%
+          group_by(key) %>%
+          summarize('Min.' = min(value), 
+                    '1st Qu.' = quantile(value, 0.25),
+                    'Median' = median(value),
+                    'Mean' = mean(value),
+                    '3rd Qu.' = quantile(value, 0.75),
+                    'Max' = max(value)
+                   ) %>%
+          pivot_longer(col=!c(key), names_to='metrics') %>%
+          pivot_wider(names_from=key, values_from=value) %>%
+          select(metrics, Sepal.Length, Sepal.Width,
+                 Petal.Length, Petal.Width)
+  return (data)
+}
+
+pretty_header <- c('', 'Sepal Length', 'Sepal Width',
+                   'Petal Length', 'Petal Width') 
+
+kable(species_stats(iris, 'setosa'), 
+      col.names=pretty_header,
+      caption='Summary of Species setosa',
+      digits = 1)
+
+kable(species_stats(iris, 'versicolor'),
+      col.names=pretty_header,
+      caption='Summary of Species versicolor',
+      digits = 1)
+
+kable(species_stats(iris, 'virginica'), 
+      col.names=pretty_header,
+      caption='Summary of Species virginica',
+      digits = 1)
+```
+
+## Visuals
+### Boxplot for Comparison
+As noted above, the sepal length from smallest to largest is setosa, versicolor, and virginica. However, the sepal width is versicolor, virginica, and setosa. The spreads seem generally similar in sepal width, but setosa has the tightest sepal length.
+```{r iris_boxplot, echo=FALSE}
+ggplot(iris, aes(x=Species, y=Sepal.Length)) +
+  geom_boxplot() + 
+  geom_jitter(aes(color=Species)) + 
+  ggtitle('Boxplot for Sepal Length')
+
+ggplot(iris, aes(x=Species, y=Sepal.Width)) +
+  geom_boxplot() + 
+  geom_jitter(aes(color=Species)) + 
+  ggtitle('Boxplot for Sepal Width')
+```
+
+### Multiple Distributions Present
+Sepal length is seemingly bi-modal, but I think that's mostly because setosa has such a tight spread that it creates one peak, while versicolor and virigica are closer with larger spread forming another peak. This is verified in the histograms broken out by species, where each only has one peak, with setosa being mostly concentraded around length of 5, while the other two are wider and concentrated between 6 and 7.
+```{r iris_hists, echo=FALSE}
+ggplot(iris, aes(x=Sepal.Length)) +
+  geom_histogram(aes(y=..density..), bins=20) +
+  geom_density(adjust=0.4, size=3, 
+               color='red', outline.type = "full") +
+  ggtitle('Histogram for Sepal Length')
+
+ggplot(iris, aes(x=Sepal.Length)) +
+  geom_histogram(aes(y=..density..), bins=20) +
+  geom_density(size=2, color='red', outline.type = "full") +
+  facet_grid(cols=vars(Species)) +
+  ggtitle('Histogram for Sepal Length')
+```
+
+### Scatterplot
+Setosa again stands out in these graphs, particularly in sepal width vs sepal length. The slope on the line is quite steep when compared to the other two species. It almost seems like a 1:1 gain - if you add 1 unit to the length, it also gains a unit in width. The other two slopes are much flatter, with width tending to be more constant with less spread. 
+
+Another interesting takeaway from these graphs is that there is overlap in sepal length - you can see the setosa has lengths that could be versicolor, and versicolor has lengths that could be virginica (this works for sepal widths as well). However, that's not true for petal length or width. If you were to give one point in petal length or width, you could be fairly accurate in guessing the species. 
+```{r iris.scatter, echo=FALSE, warning=FALSE, message=FALSE}
+ggplot(iris, aes(x=Sepal.Length, y=Sepal.Width)) +
+  geom_point(aes(color=Species)) +
+  geom_smooth(method=lm, aes(group=Species), color='Green') +
+  ggtitle('Sepal Length vs Sepal Width')
+  
+ggplot(iris, aes(x=Petal.Length, y=Petal.Width)) +
+  geom_point(aes(color=Species)) +
+  geom_smooth(method=lm, aes(group=Species), color='Green') +
+  ggtitle('Petal Length vs Petal Width')
+
+
+
+```
+
