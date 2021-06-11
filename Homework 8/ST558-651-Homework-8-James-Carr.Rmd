@@ -1,0 +1,72 @@
+---
+title: "ST558-651 Homework 8"
+author: "James Carr"
+date: "6/5/2021"
+output: 
+  html_document:
+    toc: true
+    toc_float: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+```
+### Read Data
+```{r read_data, warning=FALSE, message=FALSE}
+data <- read_csv('concentration.csv') %>%
+              filter(variety == 'M.giganteus' |
+                     variety == 'S.ravennae')
+```
+The data was read in successfully using the `read_csv` function. We have `r nrow(data)` rows and `r ncol(data)` columns.
+
+### For Loop
+```{r for_loop}
+betas <- cbind(rep(NA, 100), rep(NA, 100))
+for (i in 1:nrow(betas)) {
+  boot <- sample_n(data, size=nrow(data), replace=TRUE)
+  lm.fit <- lm(Glucose ~ concentration + I(concentration^2),
+             data=boot)
+  betas[i,] <- summary(lm.fit)$coefficients[,1][2:3]
+}
+max_est <- mean(-betas[,1] / (2*betas[,2]))
+max_se <- sd(-betas[,1] / (2*betas[,2]))
+```
+With the for loops, the estimated mean is `r round(max_est, 1)` and the estimated standard deviation is `r round(max_se, 1)`.
+
+### Replicate
+```{r replicate}
+boot_fun <- function(data, resp, pred) {
+  boot <- sample_n(data, size=nrow(data), replace=TRUE)
+  lm.fit <- lm(paste(resp, ' ~ ', pred, " + ", "I(",
+                     pred, "^2)",sep = ""),
+             data=boot)
+  return (summary(lm.fit)$coefficients[,1][2:3])
+}
+
+betas <- replicate(10000, boot_fun(data, 
+                                   'Total_lignin', 
+                                   'concentration'))
+
+
+max_est <- mean(-betas[1,] / (2*betas[2,]))
+max_se <- sd(-betas[1,] / (2*betas[2,]))
+```
+Using replicate instead of a for loops, the estimated mean is `r round(max_est, 1)` and the estimated standard deviation is `r round(max_se, 1)`.
+
+### Wrapper Function
+```{r wrapper}
+seBootFun <- function(data, resp, pred) {
+  betas <- replicate(10000, boot_fun(data, 
+                                   resp, 
+                                   pred))
+  max_se <- sd(-betas[1,] / (2*betas[2,]))
+  return (sd = max_se)
+}
+
+seBootFun(data, 'Glucose', 'concentration')
+seBootFun(data, 'Glucose', 'concentration')
+
+```
+Use the wrapper function, we return the estimated standard deviation of `r round(seBootFun(data, 'Glucose', 'concentration'), 1)`
+
