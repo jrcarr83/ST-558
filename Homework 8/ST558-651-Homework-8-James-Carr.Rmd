@@ -11,6 +11,8 @@ output:
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse)
+library(parallel)
+library(knitr)
 ```
 ### Read Data
 ```{r read_data, warning=FALSE, message=FALSE}
@@ -22,17 +24,22 @@ The data was read in successfully using the `read_csv` function. We have `r nrow
 
 ### For Loop
 ```{r for_loop}
-betas <- cbind(rep(NA, 100), rep(NA, 100))
-for (i in 1:nrow(betas)) {
-  boot <- sample_n(data, size=nrow(data), replace=TRUE)
-  lm.fit <- lm(Glucose ~ concentration + I(concentration^2),
+for_loop <- function(data, resp, pred) {
+  betas <- cbind(rep(NA, 5000), rep(NA, 5000))
+  for (i in 1:nrow(betas)) {
+    boot <- sample_n(data, size=nrow(data), replace=TRUE)
+    lm.fit <- lm(paste(resp, ' ~ ', pred, " + ", "I(",
+                     pred, "^2)",sep = ""),
              data=boot)
-  betas[i,] <- summary(lm.fit)$coefficients[,1][2:3]
+    betas[i,] <- summary(lm.fit)$coefficients[,1][2:3]
+  }
+  max_est <- mean(-betas[,1] / (2*betas[,2]))
+  max_se <- sd(-betas[,1] / (2*betas[,2]))
+  return(list('mean' = max_est, 'sd' = max_se))
 }
-max_est <- mean(-betas[,1] / (2*betas[,2]))
-max_se <- sd(-betas[,1] / (2*betas[,2]))
+for_loop_ests <- for_loop(data, 'Total_lignin', 'concentration')
 ```
-With the for loops, the estimated mean is `r round(max_est, 1)` and the estimated standard deviation is `r round(max_se, 1)`.
+With the for loops, the estimated mean is `r round(for_loop_ests$mean, 1)` and the estimated standard deviation is `r round(for_loop_ests$sd, 1)`.
 
 ### Replicate
 ```{r replicate}
@@ -44,7 +51,7 @@ boot_fun <- function(data, resp, pred) {
   return (summary(lm.fit)$coefficients[,1][2:3])
 }
 
-betas <- replicate(10000, boot_fun(data, 
+betas <- replicate(5000, boot_fun(data, 
                                    'Total_lignin', 
                                    'concentration'))
 
@@ -57,16 +64,54 @@ Using replicate instead of a for loops, the estimated mean is `r round(max_est, 
 ### Wrapper Function
 ```{r wrapper}
 seBootFun <- function(data, resp, pred) {
-  betas <- replicate(10000, boot_fun(data, 
+  betas <- replicate(5000, boot_fun(data, 
                                    resp, 
                                    pred))
   max_se <- sd(-betas[1,] / (2*betas[2,]))
   return (sd = max_se)
 }
 
-seBootFun(data, 'Glucose', 'concentration')
-seBootFun(data, 'Glucose', 'concentration')
 
+bothBootFun <- function(data, resp, pred) {
+  betas <- replicate(5000, boot_fun(data, 
+                                   resp, 
+                                   pred))
+  max_est <- mean(-betas[1,] / (2*betas[2,]))
+  max_se <- sd(-betas[1,] / (2*betas[2,]))
+  return (list(mean = max_est, sd = max_se))
+}
 ```
 Use the wrapper function, we return the estimated standard deviation of `r round(seBootFun(data, 'Glucose', 'concentration'), 1)`
 
+
+### Parallel Computing
+```{r}
+response <- c('Total_lignin',
+              'Glucose',
+              'Xylose',
+              'Arabinose')
+
+cluster <- makeCluster(detectCores() - 1)
+clusterEvalQ(cluster,library(tidyverse))
+clusterExport(cluster,c("seBootFun", "boot_fun"))
+par_comp <- parSapply(cl=cluster, FUN=seBootFun, data=data, 
+                X=response, pred='concentration')
+stopCluster(cluster)
+
+```
+Below are the standard deviation results from parallel computing the 4 responses.
+`r kable(par_comp, digits=1)`
+
+### Estimates for each
+
+```{r est_all}
+
+cluster <- makeCluster(detectCores() - 1)
+clusterEvalQ(cluster,library(tidyverse))
+clusterExport(cluster,c("bothBootFun", "boot_fun"))
+par_comp <- parSapply(cl=cluster, FUN=bothBootFun, data=data, 
+                X=response, pred='concentration')
+stopCluster(cluster)
+```
+Below are the estimates and standard deviations from all. I did use parallel computing again because the functions were all set up and it was easy to do.
+`r kable(par_comp, digits=1)`

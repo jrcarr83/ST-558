@@ -256,15 +256,20 @@ div.tocify {
 </div>
 <div id="for-loop" class="section level3">
 <h3>For Loop</h3>
-<pre class="r"><code>betas &lt;- cbind(rep(NA, 10000), rep(NA, 10000))
-for (i in 1:nrow(betas)) {
-  boot &lt;- sample_n(data, size=nrow(data), replace=TRUE)
-  lm.fit &lt;- lm(Total_lignin ~ concentration + I(concentration^2),
+<pre class="r"><code>for_loop &lt;- function(data, resp, pred) {
+  betas &lt;- cbind(rep(NA, 5000), rep(NA, 5000))
+  for (i in 1:nrow(betas)) {
+    boot &lt;- sample_n(data, size=nrow(data), replace=TRUE)
+    lm.fit &lt;- lm(paste(resp, &#39; ~ &#39;, pred, &quot; + &quot;, &quot;I(&quot;,
+                     pred, &quot;^2)&quot;,sep = &quot;&quot;),
              data=boot)
-  betas[i,] &lt;- summary(lm.fit)$coefficients[,1][2:3]
+    betas[i,] &lt;- summary(lm.fit)$coefficients[,1][2:3]
+  }
+  max_est &lt;- mean(-betas[,1] / (2*betas[,2]))
+  max_se &lt;- sd(-betas[,1] / (2*betas[,2]))
+  return(list(&#39;mean&#39; = max_est, &#39;sd&#39; = max_se))
 }
-max_est &lt;- mean(-betas[,1] / (2*betas[,2]))
-max_se &lt;- sd(-betas[,1] / (2*betas[,2]))</code></pre>
+for_loop_ests &lt;- for_loop(data, &#39;Total_lignin&#39;, &#39;concentration&#39;)</code></pre>
 <p>With the for loops, the estimated mean is 42.2 and the estimated standard deviation is 1.4.</p>
 </div>
 <div id="replicate" class="section level3">
@@ -277,7 +282,7 @@ max_se &lt;- sd(-betas[,1] / (2*betas[,2]))</code></pre>
   return (summary(lm.fit)$coefficients[,1][2:3])
 }
 
-betas &lt;- replicate(10000, boot_fun(data, 
+betas &lt;- replicate(5000, boot_fun(data, 
                                    &#39;Total_lignin&#39;, 
                                    &#39;concentration&#39;))
 
@@ -289,16 +294,169 @@ max_se &lt;- sd(-betas[1,] / (2*betas[2,]))</code></pre>
 <div id="wrapper-function" class="section level3">
 <h3>Wrapper Function</h3>
 <pre class="r"><code>seBootFun &lt;- function(data, resp, pred) {
-  betas &lt;- replicate(10000, boot_fun(data, 
+  betas &lt;- replicate(5000, boot_fun(data, 
                                    resp, 
                                    pred))
   max_se &lt;- sd(-betas[1,] / (2*betas[2,]))
   return (sd = max_se)
 }
 
-seBootFun(data, &#39;Glucose&#39;, &#39;concentration&#39;)</code></pre>
-<pre><code>## [1] 8.707651</code></pre>
-<p>Use the wrapper function, we return the estimated standard deviation of 15.7</p>
+
+bothBootFun &lt;- function(data, resp, pred) {
+  betas &lt;- replicate(5000, boot_fun(data, 
+                                   resp, 
+                                   pred))
+  max_est &lt;- mean(-betas[1,] / (2*betas[2,]))
+  max_se &lt;- sd(-betas[1,] / (2*betas[2,]))
+  return (list(mean = max_est, sd = max_se))
+}</code></pre>
+<p>Use the wrapper function, we return the estimated standard deviation of 17.7</p>
+</div>
+<div id="parallel-computing" class="section level3">
+<h3>Parallel Computing</h3>
+<pre class="r"><code>response &lt;- c(&#39;Total_lignin&#39;,
+              &#39;Glucose&#39;,
+              &#39;Xylose&#39;,
+              &#39;Arabinose&#39;)
+
+cluster &lt;- makeCluster(detectCores() - 1)
+clusterEvalQ(cluster,library(tidyverse))</code></pre>
+<pre><code>## [[1]]
+##  [1] &quot;forcats&quot;   &quot;stringr&quot;   &quot;dplyr&quot;     &quot;purrr&quot;     &quot;readr&quot;     &quot;tidyr&quot;    
+##  [7] &quot;tibble&quot;    &quot;ggplot2&quot;   &quot;tidyverse&quot; &quot;stats&quot;     &quot;graphics&quot;  &quot;grDevices&quot;
+## [13] &quot;utils&quot;     &quot;datasets&quot;  &quot;methods&quot;   &quot;base&quot;     
+## 
+## [[2]]
+##  [1] &quot;forcats&quot;   &quot;stringr&quot;   &quot;dplyr&quot;     &quot;purrr&quot;     &quot;readr&quot;     &quot;tidyr&quot;    
+##  [7] &quot;tibble&quot;    &quot;ggplot2&quot;   &quot;tidyverse&quot; &quot;stats&quot;     &quot;graphics&quot;  &quot;grDevices&quot;
+## [13] &quot;utils&quot;     &quot;datasets&quot;  &quot;methods&quot;   &quot;base&quot;     
+## 
+## [[3]]
+##  [1] &quot;forcats&quot;   &quot;stringr&quot;   &quot;dplyr&quot;     &quot;purrr&quot;     &quot;readr&quot;     &quot;tidyr&quot;    
+##  [7] &quot;tibble&quot;    &quot;ggplot2&quot;   &quot;tidyverse&quot; &quot;stats&quot;     &quot;graphics&quot;  &quot;grDevices&quot;
+## [13] &quot;utils&quot;     &quot;datasets&quot;  &quot;methods&quot;   &quot;base&quot;     
+## 
+## [[4]]
+##  [1] &quot;forcats&quot;   &quot;stringr&quot;   &quot;dplyr&quot;     &quot;purrr&quot;     &quot;readr&quot;     &quot;tidyr&quot;    
+##  [7] &quot;tibble&quot;    &quot;ggplot2&quot;   &quot;tidyverse&quot; &quot;stats&quot;     &quot;graphics&quot;  &quot;grDevices&quot;
+## [13] &quot;utils&quot;     &quot;datasets&quot;  &quot;methods&quot;   &quot;base&quot;     
+## 
+## [[5]]
+##  [1] &quot;forcats&quot;   &quot;stringr&quot;   &quot;dplyr&quot;     &quot;purrr&quot;     &quot;readr&quot;     &quot;tidyr&quot;    
+##  [7] &quot;tibble&quot;    &quot;ggplot2&quot;   &quot;tidyverse&quot; &quot;stats&quot;     &quot;graphics&quot;  &quot;grDevices&quot;
+## [13] &quot;utils&quot;     &quot;datasets&quot;  &quot;methods&quot;   &quot;base&quot;     
+## 
+## [[6]]
+##  [1] &quot;forcats&quot;   &quot;stringr&quot;   &quot;dplyr&quot;     &quot;purrr&quot;     &quot;readr&quot;     &quot;tidyr&quot;    
+##  [7] &quot;tibble&quot;    &quot;ggplot2&quot;   &quot;tidyverse&quot; &quot;stats&quot;     &quot;graphics&quot;  &quot;grDevices&quot;
+## [13] &quot;utils&quot;     &quot;datasets&quot;  &quot;methods&quot;   &quot;base&quot;     
+## 
+## [[7]]
+##  [1] &quot;forcats&quot;   &quot;stringr&quot;   &quot;dplyr&quot;     &quot;purrr&quot;     &quot;readr&quot;     &quot;tidyr&quot;    
+##  [7] &quot;tibble&quot;    &quot;ggplot2&quot;   &quot;tidyverse&quot; &quot;stats&quot;     &quot;graphics&quot;  &quot;grDevices&quot;
+## [13] &quot;utils&quot;     &quot;datasets&quot;  &quot;methods&quot;   &quot;base&quot;</code></pre>
+<pre class="r"><code>clusterExport(cluster,c(&quot;seBootFun&quot;, &quot;boot_fun&quot;))
+par_comp &lt;- parSapply(cl=cluster, FUN=seBootFun, data=data, 
+                X=response, pred=&#39;concentration&#39;)
+stopCluster(cluster)</code></pre>
+<p>Below are the standard deviation results from parallel computing the 4 responses.</p>
+<table>
+<thead>
+<tr class="header">
+<th align="left"></th>
+<th align="right">x</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">Total_lignin</td>
+<td align="right">1.4</td>
+</tr>
+<tr class="even">
+<td align="left">Glucose</td>
+<td align="right">7.4</td>
+</tr>
+<tr class="odd">
+<td align="left">Xylose</td>
+<td align="right">13062.1</td>
+</tr>
+<tr class="even">
+<td align="left">Arabinose</td>
+<td align="right">259.4</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="estimates-for-each" class="section level3">
+<h3>Estimates for each</h3>
+<pre class="r"><code>cluster &lt;- makeCluster(detectCores() - 1)
+clusterEvalQ(cluster,library(tidyverse))</code></pre>
+<pre><code>## [[1]]
+##  [1] &quot;forcats&quot;   &quot;stringr&quot;   &quot;dplyr&quot;     &quot;purrr&quot;     &quot;readr&quot;     &quot;tidyr&quot;    
+##  [7] &quot;tibble&quot;    &quot;ggplot2&quot;   &quot;tidyverse&quot; &quot;stats&quot;     &quot;graphics&quot;  &quot;grDevices&quot;
+## [13] &quot;utils&quot;     &quot;datasets&quot;  &quot;methods&quot;   &quot;base&quot;     
+## 
+## [[2]]
+##  [1] &quot;forcats&quot;   &quot;stringr&quot;   &quot;dplyr&quot;     &quot;purrr&quot;     &quot;readr&quot;     &quot;tidyr&quot;    
+##  [7] &quot;tibble&quot;    &quot;ggplot2&quot;   &quot;tidyverse&quot; &quot;stats&quot;     &quot;graphics&quot;  &quot;grDevices&quot;
+## [13] &quot;utils&quot;     &quot;datasets&quot;  &quot;methods&quot;   &quot;base&quot;     
+## 
+## [[3]]
+##  [1] &quot;forcats&quot;   &quot;stringr&quot;   &quot;dplyr&quot;     &quot;purrr&quot;     &quot;readr&quot;     &quot;tidyr&quot;    
+##  [7] &quot;tibble&quot;    &quot;ggplot2&quot;   &quot;tidyverse&quot; &quot;stats&quot;     &quot;graphics&quot;  &quot;grDevices&quot;
+## [13] &quot;utils&quot;     &quot;datasets&quot;  &quot;methods&quot;   &quot;base&quot;     
+## 
+## [[4]]
+##  [1] &quot;forcats&quot;   &quot;stringr&quot;   &quot;dplyr&quot;     &quot;purrr&quot;     &quot;readr&quot;     &quot;tidyr&quot;    
+##  [7] &quot;tibble&quot;    &quot;ggplot2&quot;   &quot;tidyverse&quot; &quot;stats&quot;     &quot;graphics&quot;  &quot;grDevices&quot;
+## [13] &quot;utils&quot;     &quot;datasets&quot;  &quot;methods&quot;   &quot;base&quot;     
+## 
+## [[5]]
+##  [1] &quot;forcats&quot;   &quot;stringr&quot;   &quot;dplyr&quot;     &quot;purrr&quot;     &quot;readr&quot;     &quot;tidyr&quot;    
+##  [7] &quot;tibble&quot;    &quot;ggplot2&quot;   &quot;tidyverse&quot; &quot;stats&quot;     &quot;graphics&quot;  &quot;grDevices&quot;
+## [13] &quot;utils&quot;     &quot;datasets&quot;  &quot;methods&quot;   &quot;base&quot;     
+## 
+## [[6]]
+##  [1] &quot;forcats&quot;   &quot;stringr&quot;   &quot;dplyr&quot;     &quot;purrr&quot;     &quot;readr&quot;     &quot;tidyr&quot;    
+##  [7] &quot;tibble&quot;    &quot;ggplot2&quot;   &quot;tidyverse&quot; &quot;stats&quot;     &quot;graphics&quot;  &quot;grDevices&quot;
+## [13] &quot;utils&quot;     &quot;datasets&quot;  &quot;methods&quot;   &quot;base&quot;     
+## 
+## [[7]]
+##  [1] &quot;forcats&quot;   &quot;stringr&quot;   &quot;dplyr&quot;     &quot;purrr&quot;     &quot;readr&quot;     &quot;tidyr&quot;    
+##  [7] &quot;tibble&quot;    &quot;ggplot2&quot;   &quot;tidyverse&quot; &quot;stats&quot;     &quot;graphics&quot;  &quot;grDevices&quot;
+## [13] &quot;utils&quot;     &quot;datasets&quot;  &quot;methods&quot;   &quot;base&quot;</code></pre>
+<pre class="r"><code>clusterExport(cluster,c(&quot;bothBootFun&quot;, &quot;boot_fun&quot;))
+par_comp &lt;- parSapply(cl=cluster, FUN=bothBootFun, data=data, 
+                X=response, pred=&#39;concentration&#39;)
+stopCluster(cluster)</code></pre>
+<p>Below are the estimates and standard deviations from all. I did use parallel computing again because the functions were all set up and it was easy to do.</p>
+<table>
+<thead>
+<tr class="header">
+<th align="left"></th>
+<th align="left">Total_lignin</th>
+<th align="left">Glucose</th>
+<th align="left">Xylose</th>
+<th align="left">Arabinose</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">mean</td>
+<td align="left">42.1918402043747</td>
+<td align="left">32.5909612186765</td>
+<td align="left">42.4557970420779</td>
+<td align="left">23.4216507994735</td>
+</tr>
+<tr class="even">
+<td align="left">sd</td>
+<td align="left">1.38492436925244</td>
+<td align="left">8.46092928258474</td>
+<td align="left">273.764586865504</td>
+<td align="left">383.76576958484</td>
+</tr>
+</tbody>
+</table>
 </div>
 
 
