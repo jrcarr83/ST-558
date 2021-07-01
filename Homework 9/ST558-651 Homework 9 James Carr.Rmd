@@ -1,0 +1,188 @@
+---
+title: "ST558-651 Homework 9"
+author: "James Carr"
+date: "6/29/2021"
+output: 
+  html_document:
+    toc: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(knitr)
+library(ggplot2)
+library(caret)
+library(tidyverse)
+library(GGally)
+```
+
+## Packages
+This *.rmd requires knitr, ggplot2, caret, tidyverse, and ggAlly libraries.
+
+## Read in data
+```{r read_csv, warning=FALSE, message=FALSE}
+#read in data for both and add flag for quality
+test <- read_csv('wineQualityTest.csv')
+train <- read_csv('wineQualityTrain.csv')
+```
+In the above code, the data is read in for the test and training sets. A new column is created as a factor for quality of wine greater than six (equal to 1) or less than 6 (equal to 0).
+
+## Summarizing Data
+### Pairs
+In the below correlation pairs data, 
+```{r pair_data, fig.height = 9, fig.width = 15, warning=FALSE, message=FALSE}
+ggpairs(train, ggplot2::aes(colour=type))
+```
+
+### Summaries
+```{r}
+red_sum <-  apply(X = train %>% filter(type=='Red') %>% 
+                    select(-type), MARGIN = 2,
+  			FUN = function(x) { 
+  				temp <- c(min(x),
+  				          quantile(x, 0.25),
+  				          median(x),
+  				          mean(x, na.rm = TRUE),
+  				          quantile(x, 0.75),
+  				          max(x))
+  				names(temp) <- c("min", "1st qtr", "median",
+  				                  "mean", "3rd Qtr", "max")
+  				temp
+  			}
+  			)
+
+white_sum <-  apply(X = train %>% filter(type=='White') %>% 
+                    select(-type), MARGIN = 2,
+  			FUN = function(x) { 
+  				temp <- c(min(x),
+  				          quantile(x, 0.25),
+  				          median(x),
+  				          mean(x, na.rm = TRUE),
+  				          quantile(x, 0.75),
+  				          max(x))
+  				names(temp) <- c("min", "1st qtr", "median",
+  				                  "mean", "3rd Qtr", "max")
+  				temp
+  			}
+  			)
+
+kable(red_sum, digits=1, caption='Red Wine Summary')
+kable(white_sum, digits=1, caption='White Wine Summary')
+```
+
+
+## General Linear Models
+```{r glm_models}
+#full additive model
+glm1 <- train(quality ~ ., data=train, method='lm',
+              preProcess=c('center', 'scale'),
+              trControl=trainControl(method='cv', number=10))
+#full interaction model
+glm2 <- train(quality ~ .^2, data=train, method='lm',
+              preProcess=c('center', 'scale'),
+              trControl=trainControl(method='cv', number=10))
+#simple model (most correlated to quality was alochol)
+glm3 <- train(quality ~ alcohol, data=train, method='lm',
+              preProcess=c('center', 'scale'),
+              trControl=trainControl(method='cv', number=10))
+#reduced model with no interacitons
+#just picking a few based on the correlation matrix
+glm4 <- train(quality ~ alcohol + type + sulphates + density, 
+              data=train, method='lm',
+              preProcess=c('center', 'scale'),
+              trControl=trainControl(method='cv', number=10))
+
+#reduced model with interacitons
+#just picking a few based on the correlation matrix
+glm5 <- train(quality ~ alcohol + sulphates*type + density*type, 
+              data=train, method='lm',
+              preProcess=c('center', 'scale'),
+              trControl=trainControl(method='cv', number=10))
+
+models <- rbind(glm1$results, glm2$results, glm4$results, 
+            glm5$results, glm3$results)
+rownames(models) <- c('Full Additive Model',
+                      'Full Interaction Model',
+                      'Reduced Additive Model',
+                      'Reduced Interaction Model',
+                      'Simple Model')
+kable(models, caption='General Linear Model Results', digits=2)
+```
+In the above models, the full interaction model showed the best performance with 10-fold cross validation. 
+
+## Logistic Models
+```{r log_models}
+train.log <- train %>% mutate(qual_fg = if_else(quality < 6, 0, 1)) %>%
+                       select(-quality)
+train.log$qual_fg <- as.factor(train.log$qual_fg)
+test.log <- test %>% mutate(qual_fg = if_else(quality < 6, 0, 1)) %>%
+                       select(-quality)
+test.log$qual_fg <- as.factor(test.log$qual_fg)
+
+
+#full additive model
+log1 <- train(qual_fg ~ ., data=train.log, method='glm', family='binomial',
+              preProcess=c('center', 'scale'),
+              trControl=trainControl(method='cv', number=10))
+#full interaction model
+log2 <- train(qual_fg ~ .^2, data=train.log, method='glm', family='binomial',
+              preProcess=c('center', 'scale'),
+              trControl=trainControl(method='cv', number=10))
+#simple model (most correlated to quality was alochol)
+log3 <- train(qual_fg ~ alcohol, data=train.log, 
+              method='glm', family='binomial',
+              preProcess=c('center', 'scale'),
+              trControl=trainControl(method='cv', number=10))
+#reduced model with no interactions
+#just picking a few based on the correlation matrix
+log4 <- train(qual_fg ~ alcohol + type + sulphates + density, 
+              data=train.log, method='glm', family='binomial',
+              preProcess=c('center', 'scale'),
+              trControl=trainControl(method='cv', number=10))
+
+#reduced model with interactions
+#just picking a few based on the correlation matrix
+log5 <- train(qual_fg ~ alcohol + sulphates*type + density*type, 
+              data=train.log, method='glm', family='binomial',
+              preProcess=c('center', 'scale'),
+              trControl=trainControl(method='cv', number=10))
+
+models <- rbind(log1$results, log2$results, log4$results, 
+            log5$results, log3$results)
+rownames(models) <- c('Full Additive Model',
+                      'Full Interaction Model',
+                      'Reduced Additive Model',
+                      'Reduced Interaction Model',
+                      'Simple Model')
+kable(models, caption='Logistic Regression Model Results', digits=2)
+```
+In the above models, the additive models seem to match the more complex interaction models so the full additive model will be selected.
+
+## Final Model Performance
+```{r test_comparison}
+pred1 <- predict(glm2, newdata=test)
+rmse <- postResample(pred1, obs=test$quality)[1]
+pred2 <- predict(log1, newdata=test.log)
+acc <- postResample(pred2, obs=test.log$qual_fg)[1]
+scr <- c(rmse, acc)
+scr.name <- c('RMSE', 'Accuracy')
+mdl.name <- c('Full Interaction Linear Model', 'Full Additive Logistic Model')
+tbl <- unname(cbind(mdl.name, scr.name, round(unname(scr), 2)))
+colnames(tbl) <- c('Model Name', 'Score Type', 'Score')
+kable(tbl, caption='Final Model Scores', digits=2)
+```
+
+## Final Regression Model Description
+For the regression model, after cross validation I ended up using the full interaction model. It has every term and all of their interactions.
+```{r echo=FALSE}
+glm2$finalModel
+```
+
+
+
+## Final Logistic Model Description
+For the logistic model, after cross validation I used the full additive model with no interactions. It has every predictor available. 
+```{r echo=FALSE}
+log1$finalModel
+```
+
