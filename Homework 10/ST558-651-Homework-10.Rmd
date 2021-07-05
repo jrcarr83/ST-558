@@ -8,6 +8,49 @@ output: html_document
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse)
+library(caret)
+```
 
+```{r read_data}
+#read data/clean it
+titanicData <- read_csv("titanic.csv")
+titanicData <- filter(titanicData, !is.na(survived) & !is.na(fare) & !is.na(age))  %>% select(survived, age, fare)
+titanicData$survived <- as.factor(titanicData$survived)
+set.seed(1)
+train <- sample(1:nrow(titanicData), size = nrow(titanicData)*0.8)
+test <- dplyr::setdiff(1:nrow(titanicData), train)
+titanicDataTrain <- titanicData[train, ] 
+titanicDataTest <- titanicData[test, ]
+```
+We filtered our data to remove NAs on the relevant columns so there is no need to check for null values. Looking at the summaries of each column, nearly 60% of passengers in the training set did not survive, and age and fair are on different scales and should be standardized. Everything should be all set to begin using crossvalidation on our KNN model.
+```{r preproc}
+summary(titanicDataTrain)
+```
+In the `trctrl` variable we have the method set to 'repeatedcv', the number of folds to set to 10, and number of repeats is set to 3. If it was set to 1, it would just be the same as the normal cv method.
+
+We will use cv to determine the correct number of nearest neighbors between 2 and 3, so the tuneGrid will be set to a dataframe where k is between those integer values. 
+```{r cv_model}
+trctrl <- trainControl(method='repeatedcv', number=10, repeats=3)
+set.seed(1)
+knn_fit <- train(survived ~ ., data=titanicDataTrain, method='knn',
+                 trControl = trctrl,
+                 preProcess = c('center', 'scale'),
+                 tuneGrid = data.frame(k=2:30))
+
+best_fit <- unlist(knn_fit$bestTune)
+knn_fit         
+```
+Using accuracy, the k = `r best_fit` model provided the best fit. Graphing accuracy based on k-nearest neighbors we get:
+```{r acc_graph}
+ggplot(data=knn_fit$results, aes(x=k, y=Accuracy)) +
+         geom_line() + 
+         ggtitle('KNN Tuning Results') +
+         geom_vline(xintercept=best_fit)
+```
+
+Looking at how this model does with prediction, we were able to correctly classify 70% of the time, which is better than simply guessing everyone died which occurred at a 60% rate.
+```{r predicting}
+pred <- predict(knn_fit, newdata=titanicDataTest)
+confusionMatrix(pred, titanicDataTest$survived)
 ```
 
