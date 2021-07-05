@@ -1,0 +1,13 @@
+---
+title: "ST558-561 Homework 11"
+author: "James Carr"
+date: "7/5/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+
+```
+

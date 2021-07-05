@@ -16,7 +16,7 @@ library(knitr)
 ```
 
 ## Databases
-### Local Databases
+### BigQuery
 #### Question 1
 *Create connection to google sandbox. Then query a table using dplyr and sql* 
 ```{r con_goog, warning=FALSE, message=FALSE}
