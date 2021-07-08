@@ -8,6 +8,95 @@ output: html_document
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse)
-
+library(caret)
+library(knitr)
 ```
 
+## Required Packages
+This program requires the tidyverse, knitr, and caret packages.
+
+## Read in the data
+Data is read in from *.csv and split into a training and test set with a 75% split in the training set.
+```{r read_data}
+diabetes <- read_csv('dataset_37_diabetes.csv', col_types = cols(
+                      class = col_factor()))
+set.seed(1)
+samp <- sample(nrow(diabetes), nrow(diabetes)*0.75, replace=FALSE)
+train <- diabetes[samp,]
+test <- diabetes[-samp,]
+```
+
+## Classification Tree
+```{r class_tree}
+
+tune_grid <- seq(from=0, to=0.4, by=0.01)
+trControl <- trainControl(method='repeatedcv', number=5, repeats=5)
+fit_class <- train(class ~ ., data=train, method='rpart',
+                   trControl=trControl,
+                   tuneGrid = data.frame(cp=tune_grid))
+
+best_tune <- round(unlist(fit_class$bestTune), 2)
+p <- ggplot(data=fit_class$results, aes(x=cp, y=Accuracy))
+p + geom_line() + 
+    geom_vline(xintercept=best_tune) + 
+    ggtitle('CP Tuning Parameter for Classification Tree')
+```
+As pictured above, the classification tree is best pruned at `r best_tune`.
+
+## Bagging Tree
+```{r bagging}
+fit_bag <- train(class ~ ., data=train, method='treebag',
+                   trControl=trControl)
+fit_bag
+```
+Bagging is showing a worse accuracy rate than a classification tree, but this is on the training set. 
+
+## Random Forest
+```{r rf}
+tune_grid <- seq(from=2, to=7, by=1)
+trControl <- trainControl(method='repeatedcv', number=5, repeats=5)
+fit_rf <- train(class ~ ., data=train, method='rf',
+                trControl=trControl,
+                tuneGrid = data.frame(mtry=tune_grid))
+
+fit_rf
+best_tune <- round(unlist(fit_rf$bestTune), 2)
+p <- ggplot(data=fit_rf$results, aes(x=mtry, y=Accuracy))
+p + geom_line() + 
+    geom_vline(xintercept=best_tune) + 
+    ggtitle('CP Tuning Parameter for Random Forest')
+```
+As pictured above, the random forest tree is best tuned at `r best_tune` for the mtry parameter.
+
+```{r boost}
+trControl <- trainControl(method='repeatedcv', number=5, repeats=5)
+fit_boost <- train(class ~ ., data=train, method='gbm',
+                trControl=trControl, verbose=FALSE)
+
+fit_boost
+best_tune <- round(unlist(fit_boost$bestTune), 2)
+```
+I used the default grid on the boosted model, and it was best tuned with the following parameters: `r kable(best_tune)`. 
+
+```{r compare}
+pred_class <- predict(fit_class, newdata=test)
+pred_bag <- predict(fit_bag, newdata=test)
+pred_rf <- predict(fit_rf, newdata=test)
+pred_boost <- predict(fit_boost, newdata=test)
+
+cf_class <- confusionMatrix(pred_class, test$class)
+cf_bag <- confusionMatrix(pred_bag, test$class)
+cf_rf <- confusionMatrix(pred_rf, test$class)
+cf_boost <- confusionMatrix(pred_boost, test$class)
+
+perf_class <- c('Classification', cf_class$overall[1])
+perf_bag <- c('Bagging', cf_bag$overall[1])
+perf_rf <- c('Random Forest', cf_rf$overall[1])
+perf_boost <- c('Boosting', cf_boost$overall[1])
+perf_all <- unname(rbind(perf_class, perf_bag, perf_rf, perf_boost))
+colnames(perf_all) <- c('Model', 'Test Set Accuracy')
+```
+Comparing the performance of each model to the test set:
+`r kable(perf_all)`
+
+Bagging performed the best in this case. I did use the default tuning methods for boosting so it's possible that could have outperformed it if I specifically tuned the four parameters. 
