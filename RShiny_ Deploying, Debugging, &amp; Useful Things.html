@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<!-- saved from url=(0048)https://shiny.stat.ncsu.edu/jbpost2/558Shiny4/#1 -->
+<html class=""><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<!--<base href="_w_36efbe39939d50d109ae89a5e7bff8b19de92b3091c8ae56/">--><base href="." target="_blank">
+    <script type="text/javascript">
+(function() {
+  // http://stackoverflow.com/questions/10964966/detect-ie-version-in-javascript
+  function isIE () {
+    var myNav = navigator.userAgent.toLowerCase();
+    return (myNav.indexOf('msie') != -1) ? parseInt(myNav.split('msie')[1]) : false;
+  }
+
+  if (isIE() === 8 || isIE() === 9){
+    // Set an absolute base href.
+    baseURL = document.URL;
+    baseURL = baseURL.substring(0, baseURL.lastIndexOf('/'));
+    document.getElementsByTagName('base')[0].setAttribute('href', baseURL + '/_w_36efbe39939d50d109ae89a5e7bff8b19de92b3091c8ae56/');
+  }
+})();
+</script>
+  
+  <script type="application/shiny-singletons"></script>
+  <script type="application/html-dependencies">jquery[3.5.1];shiny-css[1.6.0];shiny-javascript[1.6.0]</script>
+<script src="./RShiny_ Deploying, Debugging, &amp;amp; Useful Things_files/jquery.min.js.download"></script>
+<link href="./RShiny_ Deploying, Debugging, &amp;amp; Useful Things_files/shiny.min.css" rel="stylesheet">
+<script src="./RShiny_ Deploying, Debugging, &amp;amp; Useful Things_files/shiny.min.js.download"></script>  <script src="./RShiny_ Deploying, Debugging, &amp;amp; Useful Things_files/rmd_loader.js.download"></script>
+  <link href="./RShiny_ Deploying, Debugging, &amp;amp; Useful Things_files/rmd_loader.css" rel="stylesheet">
+<script src="./RShiny_ Deploying, Debugging, &amp;amp; Useful Things_files/sockjs-0.3.4.min.js.download"></script>
+<script src="./RShiny_ Deploying, Debugging, &amp;amp; Useful Things_files/shiny-server-client.min.js.download"></script>
+<script>preShinyInit({reconnect:true,disableProtocols:[],extendSession:true,fixupInternalLinks:true,subappTag:true,token:true,workerId:true});</script>
+<link rel="stylesheet" type="text/css" href="./RShiny_ Deploying, Debugging, &amp;amp; Useful Things_files/shiny-server.css">
+
+<meta name="viewport" content="width=device-width, initial-scale=1"><link rel="stylesheet" type="text/css" href="./RShiny_ Deploying, Debugging, &amp;amp; Useful Things_files/bootstrap.min.css"><script src="./RShiny_ Deploying, Debugging, &amp;amp; Useful Things_files/bootstrap.min.js.download"></script><script src="./RShiny_ Deploying, Debugging, &amp;amp; Useful Things_files/html5shiv.min.js.download"></script><script src="./RShiny_ Deploying, Debugging, &amp;amp; Useful Things_files/respond.min.js.download"></script><style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style><link rel="stylesheet" type="text/css" href="./RShiny_ Deploying, Debugging, &amp;amp; Useful Things_files/fonts.css"><link rel="stylesheet" type="text/css" href="./RShiny_ Deploying, Debugging, &amp;amp; Useful Things_files/default.css"><link rel="stylesheet" type="text/css" href="./RShiny_ Deploying, Debugging, &amp;amp; Useful Things_files/phone.css"><script src="./RShiny_ Deploying, Debugging, &amp;amp; Useful Things_files/modernizr.custom.45394.js.download"></script><script src="./RShiny_ Deploying, Debugging, &amp;amp; Useful Things_files/prettify.js.download"></script><script src="./RShiny_ Deploying, Debugging, &amp;amp; Useful Things_files/lang-r.js.download"></script><script src="./RShiny_ Deploying, Debugging, &amp;amp; Useful Things_files/lang-yaml.js.download"></script><script src="./RShiny_ Deploying, Debugging, &amp;amp; Useful Things_files/hammer.js.download"></script><script src="./RShiny_ Deploying, Debugging, &amp;amp; Useful Things_files/slide-controller.js.download"></script><script src="./RShiny_ Deploying, Debugging, &amp;amp; Useful Things_files/slide-deck.js.download"></script><link rel="stylesheet" type="text/css" href="./RShiny_ Deploying, Debugging, &amp;amp; Useful Things_files/rmd_perf.css"><script src="./RShiny_ Deploying, Debugging, &amp;amp; Useful Things_files/rmd_perf.js.download"></script>
+  <title>RShiny: Deploying, Debugging, &amp;amp; Useful Things</title>
+
+  
+  <meta http-equiv="X-UA-Compatible" content="chrome=1">
+  <meta name="generator" content="pandoc">
+
+
+
+
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+
+  <!--<base target="_blank">--><base href="." target="_blank">
+
+  <script type="text/javascript">
+    var SLIDE_CONFIG = {
+      // Slide settings
+      settings: {
+                title: 'RShiny: Deploying, Debugging, &amp; Useful Things',
+                        useBuilds: true,
+        usePrettify: true,
+        enableSlideAreas: true,
+        enableTouch: true,
+                        favIcon: 'img/logo.PNG',
+              },
+
+      // Author information
+      presenters: [
+            {
+        name:  'Justin Post' ,
+        company: '',
+        gplus: '',
+        twitter: '',
+        www: '',
+        github: ''
+      },
+            ]
+    };
+  </script>
+
+
+  <style type="text/css">
+
+    b, strong {
+      font-weight: bold;
+    }
+
+    em {
+      font-style: italic;
+    }
+
+    summary {
+      display: list-item;
+    }
+
+    slides > slide {
+      -webkit-transition: all 0.4s ease-in-out;
+      -moz-transition: all 0.4s ease-in-out;
+      -o-transition: all 0.4s ease-in-out;
+      transition: all 0.4s ease-in-out;
+    }
+
+    .auto-fadein {
+      -webkit-transition: opacity 0.6s ease-in;
+      -webkit-transition-delay: 0.4s;
+      -moz-transition: opacity 0.6s ease-in 0.4s;
+      -o-transition: opacity 0.6s ease-in 0.4s;
+      transition: opacity 0.6s ease-in 0.4s;
+      opacity: 0;
+    }
+/* https://github.com/ropensci/plotly/pull/524#issuecomment-468142578 */
+slide:not(.current) .plotly.html-widget{
+  display: block;
+}
+
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    span.underline{text-decoration: underline;}
+    div.column{display: inline-block; vertical-align: top; width: 50%;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    ul.task-list{list-style: none;}
+            div.sourceCode { overflow-x: auto; }
+    table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+      margin: 0; padding: 0; vertical-align: baseline; border: none; }
+    table.sourceCode { width: 100%; line-height: 100%; }
+    td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+    td.sourceCode { padding-left: 5px; }
+    code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
+    code > span.dt { color: #902000; } /* DataType */
+    code > span.dv { color: #40a070; } /* DecVal */
+    code > span.bn { color: #40a070; } /* BaseN */
+    code > span.fl { color: #40a070; } /* Float */
+    code > span.ch { color: #4070a0; } /* Char */
+    code > span.st { color: #4070a0; } /* String */
+    code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
+    code > span.ot { color: #007020; } /* Other */
+    code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
+    code > span.fu { color: #06287e; } /* Function */
+    code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+    code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+    code > span.cn { color: #880000; } /* Constant */
+    code > span.sc { color: #4070a0; } /* SpecialChar */
+    code > span.vs { color: #4070a0; } /* VerbatimString */
+    code > span.ss { color: #bb6688; } /* SpecialString */
+    code > span.im { } /* Import */
+    code > span.va { color: #19177c; } /* Variable */
+    code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+    code > span.op { color: #666666; } /* Operator */
+    code > span.bu { } /* BuiltIn */
+    code > span.ex { } /* Extension */
+    code > span.pp { color: #bc7a00; } /* Preprocessor */
+    code > span.at { color: #7d9029; } /* Attribute */
+    code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
+    code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+    code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+    code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+        
+    slides > slide:not(.nobackground):before {
+      font-size: 12pt;
+      content: "";
+      position: absolute;
+      bottom: 20px;
+      left: 60px;
+      background: url(img/logo.PNG) no-repeat 0 50%;
+      -webkit-background-size: 30px 30px;
+      -moz-background-size: 30px 30px;
+      -o-background-size: 30px 30px;
+      background-size: 30px 30px;
+      padding-left: 40px;
+      height: 30px;
+      line-height: 1.9;
+    }
+  </style>
+
+  <link rel="stylesheet" href="./RShiny_ Deploying, Debugging, &amp;amp; Useful Things_files/style.css" type="text/css">
+
+<script type="text/javascript" src="./RShiny_ Deploying, Debugging, &amp;amp; Useful Things_files/MathJax.js.download"></script><link rel="icon" type="image/png" href="https://shiny.stat.ncsu.edu/jbpost2/558Shiny4/_w_36efbe39939d50d109ae89a5e7bff8b19de92b3091c8ae56/img/logo.PNG"><style type="text/css">.MathJax_Hover_Frame {border-radius: .25em; -webkit-border-radius: .25em; -moz-border-radius: .25em; -khtml-border-radius: .25em; box-shadow: 0px 0px 15px #83A; -webkit-box-shadow: 0px 0px 15px #83A; -moz-box-shadow: 0px 0px 15px #83A; -khtml-box-shadow: 0px 0px 15px #83A; border: 1px solid #A6D ! important; display: inline-block; position: absolute}
+.MathJax_Menu_Button .MathJax_Hover_Arrow {position: absolute; cursor: pointer; display: inline-block; border: 2px solid #AAA; border-radius: 4px; -webkit-border-radius: 4px; -moz-border-radius: 4px; -khtml-border-radius: 4px; font-family: 'Courier New',Courier; font-size: 9px; color: #F0F0F0}
+.MathJax_Menu_Button .MathJax_Hover_Arrow span {display: block; background-color: #AAA; border: 1px solid; border-radius: 3px; line-height: 0; padding: 4px}
+.MathJax_Hover_Arrow:hover {color: white!important; border: 2px solid #CCC!important}
+.MathJax_Hover_Arrow:hover span {background-color: #CCC!important}
+</style><style type="text/css">#MathJax_About {position: fixed; left: 50%; width: auto; text-align: center; border: 3px outset; padding: 1em 2em; background-color: #DDDDDD; color: black; cursor: default; font-family: message-box; font-size: 120%; font-style: normal; text-indent: 0; text-transform: none; line-height: normal; letter-spacing: normal; word-spacing: normal; word-wrap: normal; white-space: nowrap; float: none; z-index: 201; border-radius: 15px; -webkit-border-radius: 15px; -moz-border-radius: 15px; -khtml-border-radius: 15px; box-shadow: 0px 10px 20px #808080; -webkit-box-shadow: 0px 10px 20px #808080; -moz-box-shadow: 0px 10px 20px #808080; -khtml-box-shadow: 0px 10px 20px #808080; filter: progid:DXImageTransform.Microsoft.dropshadow(OffX=2, OffY=2, Color='gray', Positive='true')}
+#MathJax_About.MathJax_MousePost {outline: none}
+.MathJax_Menu {position: absolute; background-color: white; color: black; width: auto; padding: 2px; border: 1px solid #CCCCCC; margin: 0; cursor: default; font: menu; text-align: left; text-indent: 0; text-transform: none; line-height: normal; letter-spacing: normal; word-spacing: normal; word-wrap: normal; white-space: nowrap; float: none; z-index: 201; box-shadow: 0px 10px 20px #808080; -webkit-box-shadow: 0px 10px 20px #808080; -moz-box-shadow: 0px 10px 20px #808080; -khtml-box-shadow: 0px 10px 20px #808080; filter: progid:DXImageTransform.Microsoft.dropshadow(OffX=2, OffY=2, Color='gray', Positive='true')}
+.MathJax_MenuItem {padding: 2px 2em; background: transparent}
+.MathJax_MenuArrow {position: absolute; right: .5em; padding-top: .25em; color: #666666; font-size: .75em}
+.MathJax_MenuActive .MathJax_MenuArrow {color: white}
+.MathJax_MenuArrow.RTL {left: .5em; right: auto}
+.MathJax_MenuCheck {position: absolute; left: .7em}
+.MathJax_MenuCheck.RTL {right: .7em; left: auto}
+.MathJax_MenuRadioCheck {position: absolute; left: 1em}
+.MathJax_MenuRadioCheck.RTL {right: 1em; left: auto}
+.MathJax_MenuLabel {padding: 2px 2em 4px 1.33em; font-style: italic}
+.MathJax_MenuRule {border-top: 1px solid #CCCCCC; margin: 4px 1px 0px}
+.MathJax_MenuDisabled {color: GrayText}
+.MathJax_MenuActive {background-color: Highlight; color: HighlightText}
+.MathJax_MenuDisabled:focus, .MathJax_MenuLabel:focus {background-color: #E8E8E8}
+.MathJax_ContextMenu:focus {outline: none}
+.MathJax_ContextMenu .MathJax_MenuItem:focus {outline: none}
+#MathJax_AboutClose {top: .2em; right: .2em}
+.MathJax_Menu .MathJax_MenuClose {top: -10px; left: -10px}
+.MathJax_MenuClose {position: absolute; cursor: pointer; display: inline-block; border: 2px solid #AAA; border-radius: 18px; -webkit-border-radius: 18px; -moz-border-radius: 18px; -khtml-border-radius: 18px; font-family: 'Courier New',Courier; font-size: 24px; color: #F0F0F0}
+.MathJax_MenuClose span {display: block; background-color: #AAA; border: 1.5px solid; border-radius: 18px; -webkit-border-radius: 18px; -moz-border-radius: 18px; -khtml-border-radius: 18px; line-height: 0; padding: 8px 0 6px}
+.MathJax_MenuClose:hover {color: white!important; border: 2px solid #CCC!important}
+.MathJax_MenuClose:hover span {background-color: #CCC!important}
+.MathJax_MenuClose:hover:focus {outline: none}
+</style><style type="text/css">.MathJax_Preview .MJXf-math {color: inherit!important}
+</style><style type="text/css">.MJX_Assistive_MathML {position: absolute!important; top: 0; left: 0; clip: rect(1px, 1px, 1px, 1px); padding: 1px 0 0 0!important; border: 0!important; height: 1px!important; width: 1px!important; overflow: hidden!important; display: block!important; -webkit-touch-callout: none; -webkit-user-select: none; -khtml-user-select: none; -moz-user-select: none; -ms-user-select: none; user-select: none}
+.MJX_Assistive_MathML.MJX_Assistive_MathML_Block {width: 100%!important}
+</style><style type="text/css">#MathJax_Zoom {position: absolute; background-color: #F0F0F0; overflow: auto; display: block; z-index: 301; padding: .5em; border: 1px solid black; margin: 0; font-weight: normal; font-style: normal; text-align: left; text-indent: 0; text-transform: none; line-height: normal; letter-spacing: normal; word-spacing: normal; word-wrap: normal; white-space: nowrap; float: none; -webkit-box-sizing: content-box; -moz-box-sizing: content-box; box-sizing: content-box; box-shadow: 5px 5px 15px #AAAAAA; -webkit-box-shadow: 5px 5px 15px #AAAAAA; -moz-box-shadow: 5px 5px 15px #AAAAAA; -khtml-box-shadow: 5px 5px 15px #AAAAAA; filter: progid:DXImageTransform.Microsoft.dropshadow(OffX=2, OffY=2, Color='gray', Positive='true')}
+#MathJax_ZoomOverlay {position: absolute; left: 0; top: 0; z-index: 300; display: inline-block; width: 100%; height: 100%; border: 0; padding: 0; margin: 0; background-color: white; opacity: 0; filter: alpha(opacity=0)}
+#MathJax_ZoomFrame {position: relative; display: inline-block; height: 0; width: 0}
+#MathJax_ZoomEventTrap {position: absolute; left: 0; top: 0; z-index: 302; display: inline-block; border: 0; padding: 0; margin: 0; background-color: white; opacity: 0; filter: alpha(opacity=0)}
+</style><style type="text/css">.MathJax_Preview {color: #888}
+#MathJax_Message {position: fixed; left: 1em; bottom: 1.5em; background-color: #E6E6E6; border: 1px solid #959595; margin: 0px; padding: 2px 8px; z-index: 102; color: black; font-size: 80%; width: auto; white-space: nowrap}
+#MathJax_MSIE_Frame {position: absolute; top: 0; left: 0; width: 0px; z-index: 101; border: 0px; margin: 0px; padding: 0px}
+.MathJax_Error {color: #CC0000; font-style: italic}
+</style><style type="text/css">.MJXp-script {font-size: .8em}
+.MJXp-right {-webkit-transform-origin: right; -moz-transform-origin: right; -ms-transform-origin: right; -o-transform-origin: right; transform-origin: right}
+.MJXp-bold {font-weight: bold}
+.MJXp-italic {font-style: italic}
+.MJXp-scr {font-family: MathJax_Script,'Times New Roman',Times,STIXGeneral,serif}
+.MJXp-frak {font-family: MathJax_Fraktur,'Times New Roman',Times,STIXGeneral,serif}
+.MJXp-sf {font-family: MathJax_SansSerif,'Times New Roman',Times,STIXGeneral,serif}
+.MJXp-cal {font-family: MathJax_Caligraphic,'Times New Roman',Times,STIXGeneral,serif}
+.MJXp-mono {font-family: MathJax_Typewriter,'Times New Roman',Times,STIXGeneral,serif}
+.MJXp-largeop {font-size: 150%}
+.MJXp-largeop.MJXp-int {vertical-align: -.2em}
+.MJXp-math {display: inline-block; line-height: 1.2; text-indent: 0; font-family: 'Times New Roman',Times,STIXGeneral,serif; white-space: nowrap; border-collapse: collapse}
+.MJXp-display {display: block; text-align: center; margin: 1em 0}
+.MJXp-math span {display: inline-block}
+.MJXp-box {display: block!important; text-align: center}
+.MJXp-box:after {content: " "}
+.MJXp-rule {display: block!important; margin-top: .1em}
+.MJXp-char {display: block!important}
+.MJXp-mo {margin: 0 .15em}
+.MJXp-mfrac {margin: 0 .125em; vertical-align: .25em}
+.MJXp-denom {display: inline-table!important; width: 100%}
+.MJXp-denom > * {display: table-row!important}
+.MJXp-surd {vertical-align: top}
+.MJXp-surd > * {display: block!important}
+.MJXp-script-box > *  {display: table!important; height: 50%}
+.MJXp-script-box > * > * {display: table-cell!important; vertical-align: top}
+.MJXp-script-box > *:last-child > * {vertical-align: bottom}
+.MJXp-script-box > * > * > * {display: block!important}
+.MJXp-mphantom {visibility: hidden}
+.MJXp-munderover {display: inline-table!important}
+.MJXp-over {display: inline-block!important; text-align: center}
+.MJXp-over > * {display: block!important}
+.MJXp-munderover > * {display: table-row!important}
+.MJXp-mtable {vertical-align: .25em; margin: 0 .125em}
+.MJXp-mtable > * {display: inline-table!important; vertical-align: middle}
+.MJXp-mtr {display: table-row!important}
+.MJXp-mtd {display: table-cell!important; text-align: center; padding: .5em 0 0 .5em}
+.MJXp-mtr > .MJXp-mtd:first-child {padding-left: 0}
+.MJXp-mtr:first-child > .MJXp-mtd {padding-top: 0}
+.MJXp-mlabeledtr {display: table-row!important}
+.MJXp-mlabeledtr > .MJXp-mtd:first-child {padding-left: 0}
+.MJXp-mlabeledtr:first-child > .MJXp-mtd {padding-top: 0}
+.MJXp-merror {background-color: #FFFF88; color: #CC0000; border: 1px solid #CC0000; padding: 1px 3px; font-style: normal; font-size: 90%}
+.MJXp-scale0 {-webkit-transform: scaleX(.0); -moz-transform: scaleX(.0); -ms-transform: scaleX(.0); -o-transform: scaleX(.0); transform: scaleX(.0)}
+.MJXp-scale1 {-webkit-transform: scaleX(.1); -moz-transform: scaleX(.1); -ms-transform: scaleX(.1); -o-transform: scaleX(.1); transform: scaleX(.1)}
+.MJXp-scale2 {-webkit-transform: scaleX(.2); -moz-transform: scaleX(.2); -ms-transform: scaleX(.2); -o-transform: scaleX(.2); transform: scaleX(.2)}
+.MJXp-scale3 {-webkit-transform: scaleX(.3); -moz-transform: scaleX(.3); -ms-transform: scaleX(.3); -o-transform: scaleX(.3); transform: scaleX(.3)}
+.MJXp-scale4 {-webkit-transform: scaleX(.4); -moz-transform: scaleX(.4); -ms-transform: scaleX(.4); -o-transform: scaleX(.4); transform: scaleX(.4)}
+.MJXp-scale5 {-webkit-transform: scaleX(.5); -moz-transform: scaleX(.5); -ms-transform: scaleX(.5); -o-transform: scaleX(.5); transform: scaleX(.5)}
+.MJXp-scale6 {-webkit-transform: scaleX(.6); -moz-transform: scaleX(.6); -ms-transform: scaleX(.6); -o-transform: scaleX(.6); transform: scaleX(.6)}
+.MJXp-scale7 {-webkit-transform: scaleX(.7); -moz-transform: scaleX(.7); -ms-transform: scaleX(.7); -o-transform: scaleX(.7); transform: scaleX(.7)}
+.MJXp-scale8 {-webkit-transform: scaleX(.8); -moz-transform: scaleX(.8); -ms-transform: scaleX(.8); -o-transform: scaleX(.8); transform: scaleX(.8)}
+.MJXp-scale9 {-webkit-transform: scaleX(.9); -moz-transform: scaleX(.9); -ms-transform: scaleX(.9); -o-transform: scaleX(.9); transform: scaleX(.9)}
+.MathJax_PHTML .noError {vertical-align: ; font-size: 90%; text-align: left; color: black; padding: 1px 3px; border: 1px solid}
+</style></head>
+<body class="loaded"><div id="MathJax_Message" style="display: none;"></div>
+  <div>
+    <div data-display-if="!output.__reactivedoc__" data-ns-prefix="" style="display: none;">
+      <div id="rmd_loader_wrapper">
+        <div id="rmd_loader" style="">
+          <p>Please wait...</p>
+          <img src="./RShiny_ Deploying, Debugging, &amp;amp; Useful Things_files/rmd_loader.gif">
+        </div>
+      </div>
+    </div>
+    <div id="__reactivedoc__" class="shiny-html-output shiny-bound-output" aria-live="polite">
+
+
+
+
+
+<slides class="layout-widescreen">
+
+  <slide class="title-slide segue nobackground current" data-slide-num="1" data-total-slides="24">
+        <aside class="gdbar"><img src="./RShiny_ Deploying, Debugging, &amp;amp; Useful Things_files/logo.PNG"></aside>
+        <!-- The content of this hgroup is replaced programmatically through the slide_config.json. -->
+    <hgroup class="auto-fadein">
+      <h1 data-config-title="">RShiny: Deploying, Debugging, &amp; Useful Things</h1>
+      
+      <p data-config-presenter="">Justin Post<br></p>
+          </hgroup>
+  </slide>
+
+<slide class="next" data-slide-num="2" data-total-slides="24"><hgroup><h2>Recap</h2></hgroup><article id="recap">
+
+<p><code>ui.r</code></p>
+
+<ul>
+<li>Controls layout of app (can use standard layouts or customize)<br></li>
+<li>Use strings, formatted (html style) text, widgets (<code>*Input</code> functions), and output from <code>server.r</code> (<code>*Output</code> functions)<br></li>
+<li>Separate items with commas<br></li>
+<li>Update inputs, render HTML reactively, conditionally show input</li>
+</ul>
+
+<p><code>server.r</code></p>
+
+<ul>
+<li>Back-end for app<br></li>
+<li>Create outputs that react to inputs (<code>render*</code> functions)<br></li>
+<li>To respond to input, must be in a reactive context<br></li>
+<li>Code can be included prior to <code>shinyServer()</code></li>
+</ul>
+
+</article></slide><slide class="far-next" data-slide-num="3" data-total-slides="24"><hgroup><h2>Sharing App</h2></hgroup><article id="sharing-app">
+
+<ul>
+<li>Running App locally ties up your system<br></li>
+<li>Others can't access it!<br></li>
+<li>Can host as a URL on a shiny server<br></li>
+<li>Can host apps on <a href="https://shiny.rstudio.com/articles/shinyapps.html" title="">shinyapps.io (powered by RStudio)</a>
+
+<ul>
+<li>Free, but number of connects and hours limited<br></li>
+<li>Gives stats about usage<br></li>
+<li>Integrated into R Studio</li>
+</ul></li>
+</ul>
+
+<img src="./RShiny_ Deploying, Debugging, &amp;amp; Useful Things_files/publish.PNG" title="fig:">
+
+</article></slide><slide class="" data-slide-num="4" data-total-slides="24"><hgroup><h2>Sharing App</h2></hgroup><article id="sharing-app-1">
+
+<ul>
+<li>Can host files on gitHub and run locally from there using</li>
+</ul>
+
+<p><code>shiny::runGitHub("&lt;your repository name&gt;", "&lt;your user name&gt;")</code></p>
+
+<ul>
+<li><p>Can host at a URL and run using <code>shiny::runURL("&lt;the weblink&gt;")</code></p></li>
+<li><p>More info about hosting via a URL or just posting files <a href="https://shiny.rstudio.com/tutorial/written-tutorial/lesson7/" title="">here</a></p></li>
+</ul>
+
+</article></slide><slide class="" data-slide-num="5" data-total-slides="24"><hgroup><h2>Useful Things (Static Code)</h2></hgroup><article id="useful-things-static-code">
+
+<p>Code can be placed prior to shinyServer</p>
+
+<pre class="prettyprint lang-r"><span class="com">## Code here that you only need to evaluate once.</span><span class="pln">
+</span><span class="com">## This can include reading in data, creation of </span><span class="pln">
+</span><span class="com">##      functions common to all sessions, and </span><span class="pln">
+</span><span class="com">##      reading of other common r scripts. </span><span class="pln">
+
+shinyServer</span><span class="pun">(</span><span class="kwd">function</span><span class="pun">(</span><span class="pln">input</span><span class="pun">,</span><span class="pln"> output</span><span class="pun">)</span><span class="pln"> </span><span class="pun">{</span><span class="pln">
+  
+</span><span class="com">## Code here that can be reactive.  Differs for </span><span class="pln">
+</span><span class="com">##      every instance of your app that runs.</span><span class="pln">
+
+</span><span class="pun">})</span></pre>
+
+</article></slide><slide class="" data-slide-num="6" data-total-slides="24"><hgroup><h2>Useful Things (Static Code)</h2></hgroup><article id="useful-things-static-code-1">
+
+<p><strong>Including Other Files</strong></p>
+
+<pre class="prettyprint lang-r"><span class="com">##  top of server.R, output from here is common to all users</span><span class="pln">
+
+</span><span class="com">#data set only read in once</span><span class="pln">
+dat </span><span class="pun">&lt;-</span><span class="pln"> read_csv</span><span class="pun">(</span><span class="str">"dataset.csv"</span><span class="pun">)</span><span class="pln">
+
+</span><span class="com">#function created and not modified</span><span class="pln">
+helper </span><span class="pun">&lt;-</span><span class="pln"> </span><span class="kwd">function</span><span class="pun">(</span><span class="pln">item1</span><span class="pun">,</span><span class="pln"> item2</span><span class="pun">)</span><span class="pln"> </span><span class="pun">{</span><span class="pln">item1 </span><span class="pun">+</span><span class="pln"> item2</span><span class="pun">}</span><span class="pln">
+
+shinyServer</span><span class="pun">(</span><span class="kwd">function</span><span class="pun">(</span><span class="pln">input</span><span class="pun">,</span><span class="pln"> output</span><span class="pun">)</span><span class="pln"> </span><span class="pun">{</span><span class="pln">
+  </span><span class="com">## reactive things, instance of app dependent</span><span class="pln">
+</span><span class="pun">})</span></pre>
+
+</article></slide><slide class="" data-slide-num="7" data-total-slides="24"><hgroup><h2>Useful Things (Static Code)</h2></hgroup><article id="useful-things-static-code-2">
+
+<p><strong>Including Other Files</strong></p>
+
+<p>If you have a lot of code, you can read in a separate script</p>
+
+</article></slide><slide class="" data-slide-num="8" data-total-slides="24"><hgroup><h2>Useful Things (Static Code)</h2></hgroup><article id="useful-things-static-code-3">
+
+<p><strong>Including Other Files</strong></p>
+
+<p>If you have a lot of code, you can read in a separate script</p>
+
+<ul>
+<li>If external script is <code>helpers.R</code> in same folder as app:</li>
+</ul>
+
+<pre class="prettyprint lang-r"><span class="com">##  top of server.R</span><span class="pln">
+source</span><span class="pun">(</span><span class="str">"helpers.R"</span><span class="pun">)</span><span class="pln">
+
+shinyServer</span><span class="pun">(</span><span class="kwd">function</span><span class="pun">(</span><span class="pln">input</span><span class="pun">,</span><span class="pln"> output</span><span class="pun">)</span><span class="pln"> </span><span class="pun">{</span><span class="pln">
+  </span><span class="com">##  do stuff</span><span class="pln">
+</span><span class="pun">})</span></pre>
+
+</article></slide><slide class="" data-slide-num="9" data-total-slides="24"><hgroup><h2>Improve Efficiency</h2></hgroup><article id="improve-efficiency">
+
+<ul>
+<li>Can use <code>isolate()</code> to improve code efficiency</li>
+</ul>
+
+<pre class="prettyprint lang-r"><span class="pln">renderPlot</span><span class="pun">({</span><span class="pln">
+         input</span><span class="pun">$</span><span class="pln">submit  </span><span class="com"># Do take a dependency on input$submit</span><span class="pln">
+         hist</span><span class="pun">(</span><span class="pln">data</span><span class="pun">,</span><span class="pln"> breaks </span><span class="pun">=</span><span class="pln"> isolate</span><span class="pun">(</span><span class="pln">input</span><span class="pun">$</span><span class="pln">slider</span><span class="pun">))</span><span class="pln"> </span><span class="com">#don't depend on slider</span><span class="pln">
+</span><span class="pun">})</span></pre>
+
+</article></slide><slide class="" data-slide-num="10" data-total-slides="24"><hgroup><h2>Missing data or object</h2></hgroup><article id="missing-data-or-object">
+
+<ul>
+<li><p>Used to need to check if data/object existed and return <code>NULL</code> from your <code>render*</code> function</p></li>
+<li><p>Now can use <code>req()</code> to check (see <a href="https://shiny.rstudio.com/articles/req.html" title="">this page</a> for more info)</p></li>
+</ul>
+
+<pre class="prettyprint lang-r"><span class="pln">data </span><span class="pun">&lt;-</span><span class="pln"> reactive</span><span class="pun">({</span><span class="pln">
+  req</span><span class="pun">(</span><span class="str">"input$dist"</span><span class="pun">)</span><span class="pln">
+  </span><span class="kwd">if</span><span class="pun">(</span><span class="pln">input</span><span class="pun">$</span><span class="pln">dist </span><span class="pun">==</span><span class="pln"> </span><span class="str">"norm"</span><span class="pun">){</span><span class="pln">
+    dataVals </span><span class="pun">&lt;-</span><span class="pln"> rnorm</span><span class="pun">(</span><span class="lit">100</span><span class="pun">)</span><span class="pln">
+  </span><span class="pun">}</span><span class="pln"> </span><span class="kwd">else</span><span class="pln"> </span><span class="kwd">if</span><span class="pln"> </span><span class="pun">(</span><span class="pln">input</span><span class="pun">$</span><span class="pln">dist </span><span class="pun">==</span><span class="pln"> </span><span class="str">"unif"</span><span class="pun">){</span><span class="pln">
+    dataVals </span><span class="pun">&lt;-</span><span class="pln"> runif</span><span class="pun">(</span><span class="lit">100</span><span class="pun">)</span><span class="pln">
+  </span><span class="pun">}</span><span class="pln">
+</span><span class="pun">})</span><span class="pln">
+
+output</span><span class="pun">$</span><span class="pln">plot </span><span class="pun">&lt;-</span><span class="pln"> renderPlot</span><span class="pun">({</span><span class="pln">
+  hist</span><span class="pun">(</span><span class="pln">data</span><span class="pun">())</span><span class="pln">
+</span><span class="pun">})</span></pre>
+
+</article></slide><slide class="" data-slide-num="11" data-total-slides="24"><hgroup><h2>More Interactive Plots &amp; Math</h2></hgroup><article id="more-interactive-plots-math">
+
+<ul>
+<li>Improved plots with <code>plotly</code> package!<br></li>
+<li><a href="http://shiny.stat.ncsu.edu/jbpost2/Transform/" title="">plotly example</a></li>
+</ul>
+
+</article></slide><slide class="" data-slide-num="12" data-total-slides="24"><hgroup><h2>More Interactive Plots &amp; Math</h2></hgroup><article id="more-interactive-plots-math-1">
+
+<ul>
+<li>Improved plots with <code>plotly</code> package!<br></li>
+<li><p><a href="http://shiny.stat.ncsu.edu/jbpost2/Transform/" title="">plotly example</a></p></li>
+<li><p>Can add in Latex easily!</p></li>
+<li><p>Include <code>withMathJax()</code> as a UI argument</p></li>
+<li><p>Calls in javascript that will replace Latex source code</p></li>
+</ul>
+
+<pre class="prettyprint lang-r"><span class="pln">fluidRow</span><span class="pun">(</span><span class="pln">
+    </span><span class="com">#add in latex functionality if needed</span><span class="pln">
+    withMathJax</span><span class="pun">(),</span><span class="pln">
+          </span><span class="lit">...</span></pre>
+
+</article></slide><slide class="" data-slide-num="13" data-total-slides="24"><hgroup><h2>Other Useful Things</h2></hgroup><article id="other-useful-things">
+
+<ul>
+<li><p>Create "dashboards" with <code>shinydashboard</code> package</p></li>
+<li><p>Alternatively can use <code>flexdashboard</code> (doesn't use bootstrap 3 but css flexbox layout)</p></li>
+</ul>
+
+</article></slide><slide class="" data-slide-num="14" data-total-slides="24"><hgroup><h2>Other Useful Things</h2></hgroup><article id="other-useful-things-1">
+
+<ul>
+<li><p>Create "dashboards" with <code>shinydashboard</code> package</p></li>
+<li><p>Alternatively can use <code>flexdashboard</code> (doesn't use bootstrap 3 but css flexbox layout)</p></li>
+</ul>
+
+<p>&nbsp; &nbsp;</p>
+
+<ul>
+<li>Use mouse over and click inputs<br></li>
+<li><a href="http://shiny.stat.ncsu.edu/jbpost2/BasketballCharting" title="">Click Input Example</a></li>
+</ul>
+
+</article></slide><slide class="" data-slide-num="15" data-total-slides="24"><hgroup><h2>Other Useful Things</h2></hgroup><article id="other-useful-things-2">
+
+<ul>
+<li><p>Create "dashboards" with <code>shinydashboard</code> package</p></li>
+<li><p>Alternatively can use <code>flexdashboard</code> (doesn't use bootstrap 3 but css flexbox layout)</p></li>
+</ul>
+
+<p>&nbsp; &nbsp;</p>
+
+<ul>
+<li>Use mouse over and click inputs<br></li>
+<li><a href="http://shiny.stat.ncsu.edu/jbpost2/BasketballCharting" title="">Click Input Example</a></li>
+</ul>
+
+<p>&nbsp; &nbsp;</p>
+
+<ul>
+<li>Include Shiny in your Markdown slides!<br></li>
+<li>Use ioslides and add <code>runtime: shiny</code></li>
+</ul>
+
+</article></slide><slide class="" data-slide-num="16" data-total-slides="24"><hgroup><h2>Other Useful Things</h2></hgroup><article id="other-useful-things-3">
+
+<ul>
+<li><a href="https://rstudio.github.io/shinythemes/" title="">shinythemes</a> are available<br></li>
+<li><a href="https://github.com/daattali/shinyjs" title="">shinyjs package</a> adds more functionality<br></li>
+<li>List of <a href="https://shiny.rstudio.com/reference/shiny/latest/" title="">all functions</a> for the UI and server<br></li>
+<li>Lots of good tutorials!
+
+<ul>
+<li>See weekly overview<br></li>
+</ul></li>
+<li><a href="http://shiny.rstudio.com/images/shiny-cheatsheet.pdf" title="">R Shiny Cheat Sheet</a></li>
+</ul>
+
+</article></slide><slide class="" data-slide-num="17" data-total-slides="24"><hgroup><h2>Debugging</h2></hgroup><article id="debugging">
+
+<ul>
+<li><p>Much harder in shiny!</p></li>
+<li><p><a href="https://shiny.rstudio.com/articles/debugging.html" title="">Shiny debugging page</a></p></li>
+<li><p>Recommendation: Get static working code, then transfer to shiny</p></li>
+</ul>
+
+</article></slide><slide class="" data-slide-num="18" data-total-slides="24"><hgroup><h2>Debugging</h2></hgroup><article id="debugging-1">
+
+<ul>
+<li>Can use <code>observe({print(...)})</code></li>
+</ul>
+
+<pre class="prettyprint lang-r"><span class="pln">shinyServer</span><span class="pun">(</span><span class="kwd">function</span><span class="pun">(</span><span class="pln">input</span><span class="pun">,</span><span class="pln">output</span><span class="pun">){</span><span class="pln">
+
+  </span><span class="com">#would now print to console</span><span class="pln">
+  observe</span><span class="pun">({</span><span class="pln">print</span><span class="pun">(</span><span class="pln">input</span><span class="pun">$</span><span class="pln">NI </span><span class="pun">+</span><span class="pln"> </span><span class="lit">10</span><span class="pun">)})</span><span class="pln">
+
+</span><span class="pun">}</span></pre>
+
+</article></slide><slide class="" data-slide-num="19" data-total-slides="24"><hgroup><h2>Debugging</h2></hgroup><article id="debugging-2">
+
+<p>Three major approaches:</p>
+
+<ol>
+<li><p>Breakpoints - Pausing execution of your program</p></li>
+<li><p>Tracing - Collecting information as your program runs</p></li>
+<li><p>Error handling - Finding the source of errors (both on the client and server side) and ascertaining their cause.</p></li>
+</ol>
+
+</article></slide><slide class="" data-slide-num="20" data-total-slides="24"><hgroup><h2>Breakpoints</h2></hgroup><article id="breakpoints">
+
+<ul>
+<li>Can be used in <code>server.r</code><br></li>
+<li>Click to the left of the line number<br><img src="./RShiny_ Deploying, Debugging, &amp;amp; Useful Things_files/breakpointExample.PNG" title=""></li>
+</ul>
+
+<ul class="build">
+<li class="to-build">Now can access values and step through program</li>
+</ul>
+
+<ul class="build">
+<li class="to-build">Can also use browser()</li>
+</ul>
+
+</article></slide><slide class="" data-slide-num="21" data-total-slides="24"><hgroup><h2>Tracing</h2></hgroup><article id="tracing">
+
+<ul>
+<li>Can run apps in <a href="http://shiny.rstudio.com/gallery/kmeans-example.html" title="">'showcase mode'</a><br></li>
+<li>Invoke your app with the code below</li>
+</ul>
+
+<pre class="prettyprint lang-r"><span class="pln">shiny</span><span class="pun">::</span><span class="pln">runApp</span><span class="pun">(</span><span class="pln">app</span><span class="pun">,</span><span class="pln"> display.mode</span><span class="pun">=</span><span class="str">"showcase"</span><span class="pun">)</span></pre>
+
+<ul>
+<li>Also a reactive log that can be viewed</li>
+</ul>
+
+</article></slide><slide class="" data-slide-num="22" data-total-slides="24"><hgroup><h2>Error Handling</h2></hgroup><article id="error-handling">
+
+<ul>
+<li>Check stack trace shiny returns</li>
+</ul>
+
+<img src="./RShiny_ Deploying, Debugging, &amp;amp; Useful Things_files/stacktrace.PNG" title="fig:">
+
+</article></slide><slide class="" data-slide-num="23" data-total-slides="24"><hgroup><h2>Enter Debug Mode on Error</h2></hgroup><article id="enter-debug-mode-on-error">
+
+<ul>
+<li>Can make Shiny enter the debugger when an error occurs by using the following statement:</li>
+</ul>
+
+<pre class="prettyprint lang-r"><span class="pln">options</span><span class="pun">(</span><span class="pln">shiny.error </span><span class="pun">=</span><span class="pln"> browser</span><span class="pun">)</span></pre>
+
+<ul>
+<li>Overall, experience helps!</li>
+</ul>
+
+</article></slide><slide class="" data-slide-num="24" data-total-slides="24"><hgroup><h2>Recap</h2></hgroup><article id="recap-1">
+
+<ul>
+<li><p>Shiny a great way to share results</p></li>
+<li><p><code>ui.R</code> and <code>server.R</code> files or one file using <code>app.R</code></p></li>
+<li><p>Reactive contexts important</p></li>
+<li><p>Can make UI dynamic</p></li>
+<li><p>Deploy in multiple ways</p></li>
+<li><p>Lots of add-ons/packages to make things nicer</p></li>
+<li><p>Debugging can be tricky, best to make static code work first!</p></li>
+</ul></article></slide>
+
+
+  <slide class="backdrop"></slide>
+
+<div class="slide-area" id="prev-slide-area"></div><div class="slide-area" id="next-slide-area"></div></slides>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+<!-- map slide visiblity events into shiny -->
+<script>
+  (function() {
+    if (window.jQuery) {
+       window.jQuery(document).on('slideleave', function(e) {
+         window.jQuery(e.target).trigger('hidden');
+      });
+       window.jQuery(document).on('slideenter', function(e) {
+         window.jQuery(e.target).trigger('shown');
+      });
+    }
+  })();
+</script>
+
+
+</div>
+  </div>
+
+
+<div id="ss-connect-dialog" style="display: none;"></div><div id="ss-overlay" class="ss-gray-out" style="display: none;"></div></body></html>

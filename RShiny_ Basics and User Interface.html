@@ -1,0 +1,809 @@
+<!DOCTYPE html>
+<!-- saved from url=(0048)https://shiny.stat.ncsu.edu/jbpost2/558Shiny1/#2 -->
+<html class=""><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<!--<base href="_w_a9f60156ff576a2be4e50d3d5c1685dff08d9962406c3792/">--><base href="." target="_blank">
+    <script type="text/javascript">
+(function() {
+  // http://stackoverflow.com/questions/10964966/detect-ie-version-in-javascript
+  function isIE () {
+    var myNav = navigator.userAgent.toLowerCase();
+    return (myNav.indexOf('msie') != -1) ? parseInt(myNav.split('msie')[1]) : false;
+  }
+
+  if (isIE() === 8 || isIE() === 9){
+    // Set an absolute base href.
+    baseURL = document.URL;
+    baseURL = baseURL.substring(0, baseURL.lastIndexOf('/'));
+    document.getElementsByTagName('base')[0].setAttribute('href', baseURL + '/_w_a9f60156ff576a2be4e50d3d5c1685dff08d9962406c3792/');
+  }
+})();
+</script>
+  
+  <script type="application/shiny-singletons"></script>
+  <script type="application/html-dependencies">jquery[3.5.1];shiny-css[1.6.0];shiny-javascript[1.6.0]</script>
+<script src="./RShiny_ Basics and User Interface_files/jquery.min.js.download"></script>
+<link href="./RShiny_ Basics and User Interface_files/shiny.min.css" rel="stylesheet">
+<script src="./RShiny_ Basics and User Interface_files/shiny.min.js.download"></script>  <script src="./RShiny_ Basics and User Interface_files/rmd_loader.js.download"></script>
+  <link href="./RShiny_ Basics and User Interface_files/rmd_loader.css" rel="stylesheet">
+<script src="./RShiny_ Basics and User Interface_files/sockjs-0.3.4.min.js.download"></script>
+<script src="./RShiny_ Basics and User Interface_files/shiny-server-client.min.js.download"></script>
+<script>preShinyInit({reconnect:true,disableProtocols:[],extendSession:true,fixupInternalLinks:true,subappTag:true,token:true,workerId:true});</script>
+<link rel="stylesheet" type="text/css" href="./RShiny_ Basics and User Interface_files/shiny-server.css">
+
+<meta name="viewport" content="width=device-width, initial-scale=1"><link rel="stylesheet" type="text/css" href="./RShiny_ Basics and User Interface_files/bootstrap.min.css"><link rel="stylesheet" type="text/css" href="./RShiny_ Basics and User Interface_files/bootstrap-accessibility.min.css"><script src="./RShiny_ Basics and User Interface_files/bootstrap.min.js.download"></script><script src="./RShiny_ Basics and User Interface_files/bootstrap-accessibility.min.js.download"></script><link rel="stylesheet" type="text/css" href="./RShiny_ Basics and User Interface_files/fonts.css"><link rel="stylesheet" type="text/css" href="./RShiny_ Basics and User Interface_files/default.css"><link rel="stylesheet" type="text/css" href="./RShiny_ Basics and User Interface_files/phone.css"><script src="./RShiny_ Basics and User Interface_files/modernizr.custom.45394.js.download"></script><script src="./RShiny_ Basics and User Interface_files/prettify.js.download"></script><script src="./RShiny_ Basics and User Interface_files/lang-r.js.download"></script><script src="./RShiny_ Basics and User Interface_files/lang-yaml.js.download"></script><script src="./RShiny_ Basics and User Interface_files/hammer.js.download"></script><script src="./RShiny_ Basics and User Interface_files/slide-controller.js.download"></script><script src="./RShiny_ Basics and User Interface_files/slide-deck.js.download"></script><link rel="stylesheet" type="text/css" href="./RShiny_ Basics and User Interface_files/selectize.bootstrap3.css"><script src="./RShiny_ Basics and User Interface_files/selectize.min.js.download"></script><script src="./RShiny_ Basics and User Interface_files/selectize-plugin-a11y.min.js.download"></script><script src="./RShiny_ Basics and User Interface_files/ion.rangeSlider.min.js.download"></script><script src="./RShiny_ Basics and User Interface_files/strftime-min.js.download"></script><link rel="stylesheet" type="text/css" href="./RShiny_ Basics and User Interface_files/ion.rangeSlider.css"><link rel="stylesheet" type="text/css" href="./RShiny_ Basics and User Interface_files/rmd_perf.css"><script src="./RShiny_ Basics and User Interface_files/rmd_perf.js.download"></script>
+  <title>RShiny: Basics and User Interface</title>
+
+  
+  <meta http-equiv="X-UA-Compatible" content="chrome=1">
+  <meta name="generator" content="pandoc">
+
+
+
+
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+
+  <!--<base target="_blank">--><base href="." target="_blank">
+
+  <script type="text/javascript">
+    var SLIDE_CONFIG = {
+      // Slide settings
+      settings: {
+                title: 'RShiny: Basics and User Interface',
+                        useBuilds: true,
+        usePrettify: true,
+        enableSlideAreas: true,
+        enableTouch: true,
+                        favIcon: 'logo.png',
+              },
+
+      // Author information
+      presenters: [
+            {
+        name:  'Justin Post' ,
+        company: '',
+        gplus: '',
+        twitter: '',
+        www: '',
+        github: ''
+      },
+            ]
+    };
+  </script>
+
+
+  <style type="text/css">
+
+    b, strong {
+      font-weight: bold;
+    }
+
+    em {
+      font-style: italic;
+    }
+
+    summary {
+      display: list-item;
+    }
+
+    slides > slide {
+      -webkit-transition: all 0.4s ease-in-out;
+      -moz-transition: all 0.4s ease-in-out;
+      -o-transition: all 0.4s ease-in-out;
+      transition: all 0.4s ease-in-out;
+    }
+
+    .auto-fadein {
+      -webkit-transition: opacity 0.6s ease-in;
+      -webkit-transition-delay: 0.4s;
+      -moz-transition: opacity 0.6s ease-in 0.4s;
+      -o-transition: opacity 0.6s ease-in 0.4s;
+      transition: opacity 0.6s ease-in 0.4s;
+      opacity: 0;
+    }
+/* https://github.com/ropensci/plotly/pull/524#issuecomment-468142578 */
+slide:not(.current) .plotly.html-widget{
+  display: block;
+}
+
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    span.underline{text-decoration: underline;}
+    div.column{display: inline-block; vertical-align: top; width: 50%;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    ul.task-list{list-style: none;}
+            div.sourceCode { overflow-x: auto; }
+    table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+      margin: 0; padding: 0; vertical-align: baseline; border: none; }
+    table.sourceCode { width: 100%; line-height: 100%; }
+    td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+    td.sourceCode { padding-left: 5px; }
+    code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
+    code > span.dt { color: #902000; } /* DataType */
+    code > span.dv { color: #40a070; } /* DecVal */
+    code > span.bn { color: #40a070; } /* BaseN */
+    code > span.fl { color: #40a070; } /* Float */
+    code > span.ch { color: #4070a0; } /* Char */
+    code > span.st { color: #4070a0; } /* String */
+    code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
+    code > span.ot { color: #007020; } /* Other */
+    code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
+    code > span.fu { color: #06287e; } /* Function */
+    code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+    code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+    code > span.cn { color: #880000; } /* Constant */
+    code > span.sc { color: #4070a0; } /* SpecialChar */
+    code > span.vs { color: #4070a0; } /* VerbatimString */
+    code > span.ss { color: #bb6688; } /* SpecialString */
+    code > span.im { } /* Import */
+    code > span.va { color: #19177c; } /* Variable */
+    code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+    code > span.op { color: #666666; } /* Operator */
+    code > span.bu { } /* BuiltIn */
+    code > span.ex { } /* Extension */
+    code > span.pp { color: #bc7a00; } /* Preprocessor */
+    code > span.at { color: #7d9029; } /* Attribute */
+    code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
+    code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+    code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+    code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+        
+    slides > slide:not(.nobackground):before {
+      font-size: 12pt;
+      content: "";
+      position: absolute;
+      bottom: 20px;
+      left: 60px;
+      background: url(logo.png) no-repeat 0 50%;
+      -webkit-background-size: 30px 30px;
+      -moz-background-size: 30px 30px;
+      -o-background-size: 30px 30px;
+      background-size: 30px 30px;
+      padding-left: 40px;
+      height: 30px;
+      line-height: 1.9;
+    }
+  </style>
+
+  <link rel="stylesheet" href="./RShiny_ Basics and User Interface_files/style.css" type="text/css">
+
+<script type="text/javascript" src="./RShiny_ Basics and User Interface_files/MathJax.js.download"></script><link rel="icon" type="image/png" href="https://shiny.stat.ncsu.edu/jbpost2/558Shiny1/_w_a9f60156ff576a2be4e50d3d5c1685dff08d9962406c3792/logo.png"><style type="text/css">.MathJax_Hover_Frame {border-radius: .25em; -webkit-border-radius: .25em; -moz-border-radius: .25em; -khtml-border-radius: .25em; box-shadow: 0px 0px 15px #83A; -webkit-box-shadow: 0px 0px 15px #83A; -moz-box-shadow: 0px 0px 15px #83A; -khtml-box-shadow: 0px 0px 15px #83A; border: 1px solid #A6D ! important; display: inline-block; position: absolute}
+.MathJax_Menu_Button .MathJax_Hover_Arrow {position: absolute; cursor: pointer; display: inline-block; border: 2px solid #AAA; border-radius: 4px; -webkit-border-radius: 4px; -moz-border-radius: 4px; -khtml-border-radius: 4px; font-family: 'Courier New',Courier; font-size: 9px; color: #F0F0F0}
+.MathJax_Menu_Button .MathJax_Hover_Arrow span {display: block; background-color: #AAA; border: 1px solid; border-radius: 3px; line-height: 0; padding: 4px}
+.MathJax_Hover_Arrow:hover {color: white!important; border: 2px solid #CCC!important}
+.MathJax_Hover_Arrow:hover span {background-color: #CCC!important}
+</style><style type="text/css">#MathJax_About {position: fixed; left: 50%; width: auto; text-align: center; border: 3px outset; padding: 1em 2em; background-color: #DDDDDD; color: black; cursor: default; font-family: message-box; font-size: 120%; font-style: normal; text-indent: 0; text-transform: none; line-height: normal; letter-spacing: normal; word-spacing: normal; word-wrap: normal; white-space: nowrap; float: none; z-index: 201; border-radius: 15px; -webkit-border-radius: 15px; -moz-border-radius: 15px; -khtml-border-radius: 15px; box-shadow: 0px 10px 20px #808080; -webkit-box-shadow: 0px 10px 20px #808080; -moz-box-shadow: 0px 10px 20px #808080; -khtml-box-shadow: 0px 10px 20px #808080; filter: progid:DXImageTransform.Microsoft.dropshadow(OffX=2, OffY=2, Color='gray', Positive='true')}
+#MathJax_About.MathJax_MousePost {outline: none}
+.MathJax_Menu {position: absolute; background-color: white; color: black; width: auto; padding: 2px; border: 1px solid #CCCCCC; margin: 0; cursor: default; font: menu; text-align: left; text-indent: 0; text-transform: none; line-height: normal; letter-spacing: normal; word-spacing: normal; word-wrap: normal; white-space: nowrap; float: none; z-index: 201; box-shadow: 0px 10px 20px #808080; -webkit-box-shadow: 0px 10px 20px #808080; -moz-box-shadow: 0px 10px 20px #808080; -khtml-box-shadow: 0px 10px 20px #808080; filter: progid:DXImageTransform.Microsoft.dropshadow(OffX=2, OffY=2, Color='gray', Positive='true')}
+.MathJax_MenuItem {padding: 2px 2em; background: transparent}
+.MathJax_MenuArrow {position: absolute; right: .5em; padding-top: .25em; color: #666666; font-size: .75em}
+.MathJax_MenuActive .MathJax_MenuArrow {color: white}
+.MathJax_MenuArrow.RTL {left: .5em; right: auto}
+.MathJax_MenuCheck {position: absolute; left: .7em}
+.MathJax_MenuCheck.RTL {right: .7em; left: auto}
+.MathJax_MenuRadioCheck {position: absolute; left: 1em}
+.MathJax_MenuRadioCheck.RTL {right: 1em; left: auto}
+.MathJax_MenuLabel {padding: 2px 2em 4px 1.33em; font-style: italic}
+.MathJax_MenuRule {border-top: 1px solid #CCCCCC; margin: 4px 1px 0px}
+.MathJax_MenuDisabled {color: GrayText}
+.MathJax_MenuActive {background-color: Highlight; color: HighlightText}
+.MathJax_MenuDisabled:focus, .MathJax_MenuLabel:focus {background-color: #E8E8E8}
+.MathJax_ContextMenu:focus {outline: none}
+.MathJax_ContextMenu .MathJax_MenuItem:focus {outline: none}
+#MathJax_AboutClose {top: .2em; right: .2em}
+.MathJax_Menu .MathJax_MenuClose {top: -10px; left: -10px}
+.MathJax_MenuClose {position: absolute; cursor: pointer; display: inline-block; border: 2px solid #AAA; border-radius: 18px; -webkit-border-radius: 18px; -moz-border-radius: 18px; -khtml-border-radius: 18px; font-family: 'Courier New',Courier; font-size: 24px; color: #F0F0F0}
+.MathJax_MenuClose span {display: block; background-color: #AAA; border: 1.5px solid; border-radius: 18px; -webkit-border-radius: 18px; -moz-border-radius: 18px; -khtml-border-radius: 18px; line-height: 0; padding: 8px 0 6px}
+.MathJax_MenuClose:hover {color: white!important; border: 2px solid #CCC!important}
+.MathJax_MenuClose:hover span {background-color: #CCC!important}
+.MathJax_MenuClose:hover:focus {outline: none}
+</style><style type="text/css">.MathJax_Preview .MJXf-math {color: inherit!important}
+</style><style type="text/css">.MJX_Assistive_MathML {position: absolute!important; top: 0; left: 0; clip: rect(1px, 1px, 1px, 1px); padding: 1px 0 0 0!important; border: 0!important; height: 1px!important; width: 1px!important; overflow: hidden!important; display: block!important; -webkit-touch-callout: none; -webkit-user-select: none; -khtml-user-select: none; -moz-user-select: none; -ms-user-select: none; user-select: none}
+.MJX_Assistive_MathML.MJX_Assistive_MathML_Block {width: 100%!important}
+</style><style type="text/css">#MathJax_Zoom {position: absolute; background-color: #F0F0F0; overflow: auto; display: block; z-index: 301; padding: .5em; border: 1px solid black; margin: 0; font-weight: normal; font-style: normal; text-align: left; text-indent: 0; text-transform: none; line-height: normal; letter-spacing: normal; word-spacing: normal; word-wrap: normal; white-space: nowrap; float: none; -webkit-box-sizing: content-box; -moz-box-sizing: content-box; box-sizing: content-box; box-shadow: 5px 5px 15px #AAAAAA; -webkit-box-shadow: 5px 5px 15px #AAAAAA; -moz-box-shadow: 5px 5px 15px #AAAAAA; -khtml-box-shadow: 5px 5px 15px #AAAAAA; filter: progid:DXImageTransform.Microsoft.dropshadow(OffX=2, OffY=2, Color='gray', Positive='true')}
+#MathJax_ZoomOverlay {position: absolute; left: 0; top: 0; z-index: 300; display: inline-block; width: 100%; height: 100%; border: 0; padding: 0; margin: 0; background-color: white; opacity: 0; filter: alpha(opacity=0)}
+#MathJax_ZoomFrame {position: relative; display: inline-block; height: 0; width: 0}
+#MathJax_ZoomEventTrap {position: absolute; left: 0; top: 0; z-index: 302; display: inline-block; border: 0; padding: 0; margin: 0; background-color: white; opacity: 0; filter: alpha(opacity=0)}
+</style><style type="text/css">.MathJax_Preview {color: #888}
+#MathJax_Message {position: fixed; left: 1em; bottom: 1.5em; background-color: #E6E6E6; border: 1px solid #959595; margin: 0px; padding: 2px 8px; z-index: 102; color: black; font-size: 80%; width: auto; white-space: nowrap}
+#MathJax_MSIE_Frame {position: absolute; top: 0; left: 0; width: 0px; z-index: 101; border: 0px; margin: 0px; padding: 0px}
+.MathJax_Error {color: #CC0000; font-style: italic}
+</style><style type="text/css">.MJXp-script {font-size: .8em}
+.MJXp-right {-webkit-transform-origin: right; -moz-transform-origin: right; -ms-transform-origin: right; -o-transform-origin: right; transform-origin: right}
+.MJXp-bold {font-weight: bold}
+.MJXp-italic {font-style: italic}
+.MJXp-scr {font-family: MathJax_Script,'Times New Roman',Times,STIXGeneral,serif}
+.MJXp-frak {font-family: MathJax_Fraktur,'Times New Roman',Times,STIXGeneral,serif}
+.MJXp-sf {font-family: MathJax_SansSerif,'Times New Roman',Times,STIXGeneral,serif}
+.MJXp-cal {font-family: MathJax_Caligraphic,'Times New Roman',Times,STIXGeneral,serif}
+.MJXp-mono {font-family: MathJax_Typewriter,'Times New Roman',Times,STIXGeneral,serif}
+.MJXp-largeop {font-size: 150%}
+.MJXp-largeop.MJXp-int {vertical-align: -.2em}
+.MJXp-math {display: inline-block; line-height: 1.2; text-indent: 0; font-family: 'Times New Roman',Times,STIXGeneral,serif; white-space: nowrap; border-collapse: collapse}
+.MJXp-display {display: block; text-align: center; margin: 1em 0}
+.MJXp-math span {display: inline-block}
+.MJXp-box {display: block!important; text-align: center}
+.MJXp-box:after {content: " "}
+.MJXp-rule {display: block!important; margin-top: .1em}
+.MJXp-char {display: block!important}
+.MJXp-mo {margin: 0 .15em}
+.MJXp-mfrac {margin: 0 .125em; vertical-align: .25em}
+.MJXp-denom {display: inline-table!important; width: 100%}
+.MJXp-denom > * {display: table-row!important}
+.MJXp-surd {vertical-align: top}
+.MJXp-surd > * {display: block!important}
+.MJXp-script-box > *  {display: table!important; height: 50%}
+.MJXp-script-box > * > * {display: table-cell!important; vertical-align: top}
+.MJXp-script-box > *:last-child > * {vertical-align: bottom}
+.MJXp-script-box > * > * > * {display: block!important}
+.MJXp-mphantom {visibility: hidden}
+.MJXp-munderover {display: inline-table!important}
+.MJXp-over {display: inline-block!important; text-align: center}
+.MJXp-over > * {display: block!important}
+.MJXp-munderover > * {display: table-row!important}
+.MJXp-mtable {vertical-align: .25em; margin: 0 .125em}
+.MJXp-mtable > * {display: inline-table!important; vertical-align: middle}
+.MJXp-mtr {display: table-row!important}
+.MJXp-mtd {display: table-cell!important; text-align: center; padding: .5em 0 0 .5em}
+.MJXp-mtr > .MJXp-mtd:first-child {padding-left: 0}
+.MJXp-mtr:first-child > .MJXp-mtd {padding-top: 0}
+.MJXp-mlabeledtr {display: table-row!important}
+.MJXp-mlabeledtr > .MJXp-mtd:first-child {padding-left: 0}
+.MJXp-mlabeledtr:first-child > .MJXp-mtd {padding-top: 0}
+.MJXp-merror {background-color: #FFFF88; color: #CC0000; border: 1px solid #CC0000; padding: 1px 3px; font-style: normal; font-size: 90%}
+.MJXp-scale0 {-webkit-transform: scaleX(.0); -moz-transform: scaleX(.0); -ms-transform: scaleX(.0); -o-transform: scaleX(.0); transform: scaleX(.0)}
+.MJXp-scale1 {-webkit-transform: scaleX(.1); -moz-transform: scaleX(.1); -ms-transform: scaleX(.1); -o-transform: scaleX(.1); transform: scaleX(.1)}
+.MJXp-scale2 {-webkit-transform: scaleX(.2); -moz-transform: scaleX(.2); -ms-transform: scaleX(.2); -o-transform: scaleX(.2); transform: scaleX(.2)}
+.MJXp-scale3 {-webkit-transform: scaleX(.3); -moz-transform: scaleX(.3); -ms-transform: scaleX(.3); -o-transform: scaleX(.3); transform: scaleX(.3)}
+.MJXp-scale4 {-webkit-transform: scaleX(.4); -moz-transform: scaleX(.4); -ms-transform: scaleX(.4); -o-transform: scaleX(.4); transform: scaleX(.4)}
+.MJXp-scale5 {-webkit-transform: scaleX(.5); -moz-transform: scaleX(.5); -ms-transform: scaleX(.5); -o-transform: scaleX(.5); transform: scaleX(.5)}
+.MJXp-scale6 {-webkit-transform: scaleX(.6); -moz-transform: scaleX(.6); -ms-transform: scaleX(.6); -o-transform: scaleX(.6); transform: scaleX(.6)}
+.MJXp-scale7 {-webkit-transform: scaleX(.7); -moz-transform: scaleX(.7); -ms-transform: scaleX(.7); -o-transform: scaleX(.7); transform: scaleX(.7)}
+.MJXp-scale8 {-webkit-transform: scaleX(.8); -moz-transform: scaleX(.8); -ms-transform: scaleX(.8); -o-transform: scaleX(.8); transform: scaleX(.8)}
+.MJXp-scale9 {-webkit-transform: scaleX(.9); -moz-transform: scaleX(.9); -ms-transform: scaleX(.9); -o-transform: scaleX(.9); transform: scaleX(.9)}
+.MathJax_PHTML .noError {vertical-align: ; font-size: 90%; text-align: left; color: black; padding: 1px 3px; border: 1px solid}
+</style></head>
+<body class="loaded"><div id="MathJax_Message" style="display: none;"></div>
+  <div>
+    <div data-display-if="!output.__reactivedoc__" data-ns-prefix="" style="display: none;">
+      <div id="rmd_loader_wrapper">
+        <div id="rmd_loader" style="display: none">
+          <p>Please wait...</p>
+          <img src="./RShiny_ Basics and User Interface_files/rmd_loader.gif">
+        </div>
+      </div>
+    </div>
+    <div id="__reactivedoc__" class="shiny-html-output shiny-bound-output" aria-live="polite">
+
+
+
+
+
+<slides class="layout-widescreen">
+
+  <slide class="title-slide segue nobackground past" data-slide-num="1" data-total-slides="32">
+        <aside class="gdbar"><img src="./RShiny_ Basics and User Interface_files/logo.png"></aside>
+        <!-- The content of this hgroup is replaced programmatically through the slide_config.json. -->
+    <hgroup class="auto-fadein">
+      <h1 data-config-title="">RShiny: Basics and User Interface</h1>
+      
+      <p data-config-presenter="">Justin Post<br></p>
+          </hgroup>
+  </slide>
+
+<slide class="current" data-slide-num="2" data-total-slides="32"><hgroup><h2>Big picture</h2></hgroup><article id="big-picture">
+
+<ul>
+<li><p>Know how to read data in, combine and manipulate it, summarize, and visualize</p>
+
+<ul>
+<li><code>tidyverse</code> great!</li>
+</ul></li>
+<li><p>Know how to do some predictive modeling</p>
+
+<ul>
+<li><code>caret</code> is awesome</li>
+</ul></li>
+<li><p>Know how to collaborate and communicate code/results</p>
+
+<ul>
+<li>via github and <code>rmarkdown</code></li>
+</ul></li>
+<li><p>Ready to create interactive web applets or dashboards!</p>
+
+<ul>
+<li>Great way to present your data and results for others</li>
+</ul></li>
+</ul>
+
+</article></slide><slide class="next" data-slide-num="3" data-total-slides="32"><hgroup><h2>What is R Shiny?</h2></hgroup><article id="what-is-r-shiny">
+
+<ul>
+<li><p><a href="http://shiny.rstudio.com/" title="">R Shiny Package</a></p>
+
+<ul>
+<li>Developed by RStudio<br></li>
+<li>Allows for creation of apps and dashboards</li>
+</ul></li>
+<li><p>A .R file (or two) with special code to create an app</p>
+
+<ul>
+<li><code>ui.R</code> (User Interface)<br></li>
+<li><code>server.R</code> (R functions that run/respond to UI)</li>
+<li><code>app.R</code> (both UI and server combined)</li>
+</ul></li>
+<li><p>Requires no HTML, CSS, or JavaScript!</p></li>
+</ul>
+
+</article></slide><slide class="far-next" data-slide-num="4" data-total-slides="32"><hgroup><h2>Example App</h2></hgroup><article id="example-app">
+
+<p></p><div class="shiny-input-panel">
+<div class="shiny-flow-layout">
+<div>
+<div class="form-group shiny-input-container">
+<label class="control-label" id="n_breaks-label" for="n_breaks-selectized">Number of bins:</label>
+<div>
+<select id="n_breaks" tabindex="-1" class="selectized shiny-bound-input" style="display: none;"><option value="20" selected="selected">20</option></select><div class="selectize-control single plugin-selectize-plugin-a11y"><div class="selectize-input items full has-options has-items"><div class="item" data-value="20">20</div><input type="text" autocomplete="off" tabindex="" id="n_breaks-selectized" role="combobox" aria-expanded="false" haspopup="listbox" aria-owns="yvjvn4dvuy" style="width: 4px;"></div><div class="selectize-dropdown single plugin-selectize-plugin-a11y" style="display: none;"><div class="selectize-dropdown-content" role="listbox" id="yvjvn4dvuy"></div></div></div>
+<script type="application/json" data-for="n_breaks" data-nonempty="">{"plugins":["selectize-plugin-a11y"]}</script>
+</div>
+</div>
+</div>
+<div>
+<div class="form-group shiny-input-container">
+<label class="control-label" id="bw_adjust-label" for="bw_adjust">Bandwidth adjustment:</label>
+<span class="irs irs--shiny js-irs-0 irs-with-grid"><span class="irs"><span class="irs-line" tabindex="0"></span><span class="irs-min" style="visibility: visible;">0.2</span><span class="irs-max" style="visibility: visible;">2</span><span class="irs-from" style="visibility: hidden;">0</span><span class="irs-to" style="visibility: hidden;">0</span><span class="irs-single" style="left: 42.1174%;">1</span></span><span class="irs-grid" style="width: 89.4231%; left: 5.18846%;"><span class="irs-grid-pol" style="left: 0%"></span><span class="irs-grid-text js-grid-text-0" style="left: 0%; margin-left: -4.45212%;">0.2</span><span class="irs-grid-pol small" style="left: 7.4074074074074066%"></span><span class="irs-grid-pol small" style="left: 3.7037037037037033%"></span><span class="irs-grid-pol" style="left: 11.11111111111111%"></span><span class="irs-grid-text js-grid-text-1" style="left: 11.1111%; visibility: visible; margin-left: -4.45212%;">0.4</span><span class="irs-grid-pol small" style="left: 18.51851851851852%"></span><span class="irs-grid-pol small" style="left: 14.814814814814813%"></span><span class="irs-grid-pol" style="left: 22.22222222222222%"></span><span class="irs-grid-text js-grid-text-2" style="left: 22.2222%; visibility: visible; margin-left: -4.45212%;">0.6</span><span class="irs-grid-pol small" style="left: 29.629629629629626%"></span><span class="irs-grid-pol small" style="left: 25.925925925925924%"></span><span class="irs-grid-pol" style="left: 33.33333333333333%"></span><span class="irs-grid-text js-grid-text-3" style="left: 33.3333%; visibility: visible; margin-left: -4.45212%;">0.8</span><span class="irs-grid-pol small" style="left: 40.74074074074074%"></span><span class="irs-grid-pol small" style="left: 37.03703703703703%"></span><span class="irs-grid-pol" style="left: 44.44444444444444%"></span><span class="irs-grid-text js-grid-text-4" style="left: 44.4444%; margin-left: -2.64673%;">1</span><span class="irs-grid-pol small" style="left: 51.851851851851855%"></span><span class="irs-grid-pol small" style="left: 48.148148148148145%"></span><span class="irs-grid-pol" style="left: 55.55555555555556%"></span><span class="irs-grid-text js-grid-text-5" style="left: 55.5556%; visibility: visible; margin-left: -4.45212%;">1.2</span><span class="irs-grid-pol small" style="left: 62.962962962962955%"></span><span class="irs-grid-pol small" style="left: 59.25925925925926%"></span><span class="irs-grid-pol" style="left: 66.66666666666666%"></span><span class="irs-grid-text js-grid-text-6" style="left: 66.6667%; visibility: visible; margin-left: -4.45212%;">1.4</span><span class="irs-grid-pol small" style="left: 74.07407407407406%"></span><span class="irs-grid-pol small" style="left: 70.37037037037037%"></span><span class="irs-grid-pol" style="left: 77.77777777777777%"></span><span class="irs-grid-text js-grid-text-7" style="left: 77.7778%; visibility: visible; margin-left: -4.45212%;">1.6</span><span class="irs-grid-pol small" style="left: 85.18518518518518%"></span><span class="irs-grid-pol small" style="left: 81.48148148148148%"></span><span class="irs-grid-pol" style="left: 88.88888888888889%"></span><span class="irs-grid-text js-grid-text-8" style="left: 88.8889%; margin-left: -4.45212%;">1.8</span><span class="irs-grid-pol small" style="left: 96.29629629629629%"></span><span class="irs-grid-pol small" style="left: 92.5925925925926%"></span><span class="irs-grid-pol" style="left: 100%"></span><span class="irs-grid-text js-grid-text-9" style="left: 100%; visibility: visible; margin-left: -2.64673%;">2</span></span><span class="irs-bar irs-bar--single" style="left: 0px; width: 45.0321%;"></span><span class="irs-shadow shadow-single" style="display: none;"></span><span class="irs-handle single" style="left: 39.7436%;"><i></i><i></i><i></i></span></span><input class="js-range-slider irs-hidden-input shiny-bound-input" id="bw_adjust" data-skin="shiny" data-min="0.2" data-max="2" data-from="1" data-step="0.2" data-grid="true" data-grid-num="9" data-grid-snap="false" data-prettify-separator="," data-prettify-enabled="true" data-keyboard="true" data-data-type="number" tabindex="-1" readonly="">
+</div>
+</div>
+</div>
+</div><div id="out5d532bc40f9d344a" class="shiny-plot-output shiny-bound-output" style="width:100%;height:400px;" aria-live="polite"><img src="data:image/png;base64,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" width="980" height="400" alt="Plot object"></div><p></p>
+
+</article></slide><slide class="" data-slide-num="5" data-total-slides="32"><hgroup><h2>How to Develop R Shiny Apps</h2></hgroup><article id="how-to-develop-r-shiny-apps">
+
+<ul>
+<li><p>Explore online repositories/resources for existing apps</p>
+
+<ul>
+<li>Learn capabilities!</li>
+</ul></li>
+<li><p>Learn how to create the user interface (UI)</p></li>
+<li><p>Understand how the server (R) backend works</p></li>
+<li><p>Customize apps</p></li>
+<li><p>Learn solutions to common issues when creating apps and deploy it</p></li>
+</ul>
+
+</article></slide><slide class="" data-slide-num="6" data-total-slides="32"><hgroup><h2>Available Apps</h2></hgroup><article id="available-apps">
+
+<ul>
+<li><p>Many available resources!!</p></li>
+<li><p><a href="https://shiny.rstudio.com/gallery/" title="">Shiny Gallery/Showcase</a></p></li>
+<li><p><a href="https://github.com/gastonstat/shiny-introstats/" title="">Stat Concepts</a></p></li>
+<li><p><a href="https://www.researchgate.net/publication/298786680_Web_Application_Teaching_Tools_for_Statistics_Using_R_and_Shiny" title="">More Stat Concepts</a></p></li>
+<li><p><a href="http://www.statistics.calpoly.edu/shiny" title="">Even more!</a></p></li>
+<li><p>Take a few minutes to explore some apps if you haven't already!</p></li>
+</ul>
+
+</article></slide><slide class="" data-slide-num="7" data-total-slides="32"><hgroup><h2>Elements of an App</h2></hgroup><article id="elements-of-an-app">
+
+<ul>
+<li>Each app has two things
+
+<ul>
+<li>User Interface (UI)</li>
+<li>Server</li>
+</ul></li>
+</ul>
+
+</article></slide><slide class="" data-slide-num="8" data-total-slides="32"><hgroup><h2>Elements of an App</h2></hgroup><article id="elements-of-an-app-1">
+
+<ul>
+<li>Each app has two things
+
+<ul>
+<li>User Interface (UI)</li>
+<li>Server</li>
+</ul></li>
+<li>UI determines <strong>layout</strong> of app
+
+<ul>
+<li>Sets up widgets (items users can interact with)</li>
+</ul></li>
+</ul>
+
+</article></slide><slide class="" data-slide-num="9" data-total-slides="32"><hgroup><h2>Elements of an App</h2></hgroup><article id="elements-of-an-app-2">
+
+<ul>
+<li>Each app has two things
+
+<ul>
+<li>User Interface (UI)</li>
+<li>Server</li>
+</ul></li>
+<li>UI determines <strong>layout</strong> of app
+
+<ul>
+<li>Sets up widgets (items users can interact with)</li>
+</ul></li>
+<li>Server contains R code to <strong>run for the app</strong>
+
+<ul>
+<li>Can include plots, model fitting, any R code really…</li>
+</ul></li>
+</ul>
+
+</article></slide><slide class="" data-slide-num="10" data-total-slides="32"><hgroup><h2>Elements of an App</h2></hgroup><article id="elements-of-an-app-3">
+
+<ul>
+<li>Each app has two things
+
+<ul>
+<li>User Interface (UI)</li>
+<li>Server</li>
+</ul></li>
+<li>UI determines <strong>layout</strong> of app
+
+<ul>
+<li>Sets up widgets (items users can interact with)</li>
+</ul></li>
+<li>Server contains R code to <strong>run for the app</strong>
+
+<ul>
+<li>Can include plots, model fitting, any R code really…</li>
+</ul></li>
+<li>Can do with single file (<code>app.R</code>) but we'll use a separate file (<code>ui.R</code> and <code>server.R</code>)</li>
+</ul>
+
+</article></slide><slide class="" data-slide-num="11" data-total-slides="32"><hgroup><h2>Two File Approach</h2></hgroup><article id="two-file-approach">
+
+<ul>
+<li><p>Create folder for each App you create</p></li>
+<li><p>Each App's folder should have <code>ui.R</code> and <code>server.R</code> files</p></li>
+<li><p>(If single file, <code>app.R</code> in each folder)</p></li>
+</ul>
+
+</article></slide><slide class="" data-slide-num="12" data-total-slides="32"><hgroup><h2></h2></hgroup><article>
+
+<img src="./RShiny_ Basics and User Interface_files/folderStructure.PNG" title="fig:">
+
+</article></slide><slide class="" data-slide-num="13" data-total-slides="32"><hgroup><h2><code>ui.R</code> Basic Layout</h2></hgroup><article id="ui.r-basic-layout">
+
+<pre class="prettyprint lang-r"><span class="pln">library</span><span class="pun">(</span><span class="pln">shiny</span><span class="pun">)</span><span class="pln">
+
+ui </span><span class="pun">&lt;-</span><span class="pln"> fluidPage</span><span class="pun">(</span><span class="pln">
+    titlePanel</span><span class="pun">(),</span><span class="pln"> 
+    
+  sidebarLayout</span><span class="pun">(</span><span class="pln">
+    sidebarPanel</span><span class="pun">(</span><span class="com">#usually widgets</span><span class="pln">
+      </span><span class="pun">),</span><span class="pln">
+    mainPanel</span><span class="pun">(</span><span class="com">#usually output</span><span class="pln">
+      </span><span class="pun">)</span><span class="pln">
+  </span><span class="pun">)</span><span class="pln">
+</span><span class="pun">)</span></pre>
+
+</article></slide><slide class="" data-slide-num="14" data-total-slides="32"><hgroup><h2>UI Common Layout</h2></hgroup><article id="ui-common-layout">
+
+<div class="container-fluid">
+<h2>title panel</h2>
+<div class="row">
+<div class="col-sm-4">
+<form class="well" role="complementary">
+sidebar panel
+<br>
+|
+<br>
+|
+<br>
+|
+<br>
+|
+<br>
+|
+<br>
+|
+<br>
+V
+<br>
+Usually User Inputs
+</form>
+</div>
+<div class="col-sm-8" role="main">
+main panel content--------------------&gt;
+<br>
+|
+<br>
+|
+<br>
+|
+<br>
+|        Usually Output
+<br>
+|        that Reacts to User Input
+<br>
+|
+<br>
+V
+</div>
+</div>
+</div>
+
+</article></slide><slide class="" data-slide-num="15" data-total-slides="32"><hgroup><h2><code>server.R</code> Basic File</h2></hgroup><article id="server.r-basic-file">
+
+<pre class="prettyprint lang-r"><span class="pln">library</span><span class="pun">(</span><span class="pln">shiny</span><span class="pun">)</span><span class="pln">
+
+shinyServer</span><span class="pun">(</span><span class="kwd">function</span><span class="pun">(</span><span class="pln">input</span><span class="pun">,</span><span class="pln"> output</span><span class="pun">,</span><span class="pln"> session</span><span class="pun">)</span><span class="pln"> </span><span class="pun">{</span><span class="pln">
+
+</span><span class="pun">})</span></pre>
+
+</article></slide><slide class="" data-slide-num="16" data-total-slides="32"><hgroup><h2>Shiny Templates</h2></hgroup><article id="shiny-templates">
+
+<p>Readily available in R studio<br><img src="./RShiny_ Basics and User Interface_files/templates.PNG" title=""></p>
+
+</article></slide><slide class="" data-slide-num="17" data-total-slides="32"><hgroup><h2>Two File Template</h2></hgroup><article id="two-file-template">
+
+<pre class="prettyprint lang-r"><span class="pln">library</span><span class="pun">(</span><span class="pln">shiny</span><span class="pun">)</span><span class="pln">
+ui </span><span class="pun">&lt;-</span><span class="pln"> fluidPage</span><span class="pun">(</span><span class="pln">
+   </span><span class="com"># Application title</span><span class="pln">
+   titlePanel</span><span class="pun">(</span><span class="str">"Old Faithful Geyser Data"</span><span class="pun">),</span><span class="pln">
+   </span><span class="com"># Sidebar with a slider input for number of bins </span><span class="pln">
+   sidebarLayout</span><span class="pun">(</span><span class="pln">
+      sidebarPanel</span><span class="pun">(</span><span class="pln">
+         sliderInput</span><span class="pun">(</span><span class="str">"bins"</span><span class="pun">,</span><span class="pln">
+                     </span><span class="str">"Number of bins:"</span><span class="pun">,</span><span class="pln">
+                     min </span><span class="pun">=</span><span class="pln"> </span><span class="lit">1</span><span class="pun">,</span><span class="pln">
+                     max </span><span class="pun">=</span><span class="pln"> </span><span class="lit">50</span><span class="pun">,</span><span class="pln">
+                     value </span><span class="pun">=</span><span class="pln"> </span><span class="lit">30</span><span class="pun">)</span><span class="pln">
+      </span><span class="pun">),</span><span class="pln">
+      </span><span class="com"># Show a plot of the generated distribution</span><span class="pln">
+      mainPanel</span><span class="pun">(</span><span class="pln">
+         plotOutput</span><span class="pun">(</span><span class="str">"distPlot"</span><span class="pun">)</span><span class="pln">
+      </span><span class="pun">)</span><span class="pln">
+   </span><span class="pun">)</span><span class="pln">
+</span><span class="pun">)</span></pre>
+
+</article></slide><slide class="" data-slide-num="18" data-total-slides="32"><hgroup><h2>Two File Template</h2></hgroup><article id="two-file-template-1">
+
+<pre class="prettyprint lang-r"><span class="pln">library</span><span class="pun">(</span><span class="pln">shiny</span><span class="pun">)</span><span class="pln">  
+
+</span><span class="com"># Define server logic required to draw a histogram</span><span class="pln">
+server </span><span class="pun">&lt;-</span><span class="pln"> </span><span class="kwd">function</span><span class="pun">(</span><span class="pln">input</span><span class="pun">,</span><span class="pln"> output</span><span class="pun">)</span><span class="pln"> </span><span class="pun">{</span><span class="pln">
+   output</span><span class="pun">$</span><span class="pln">distPlot </span><span class="pun">&lt;-</span><span class="pln"> renderPlot</span><span class="pun">({</span><span class="pln">
+      </span><span class="com"># generate bins based on input$bins from ui.R</span><span class="pln">
+      x    </span><span class="pun">&lt;-</span><span class="pln"> faithful</span><span class="pun">[,</span><span class="pln"> </span><span class="lit">2</span><span class="pun">]</span><span class="pln"> 
+      bins </span><span class="pun">&lt;-</span><span class="pln"> seq</span><span class="pun">(</span><span class="pln">min</span><span class="pun">(</span><span class="pln">x</span><span class="pun">),</span><span class="pln"> max</span><span class="pun">(</span><span class="pln">x</span><span class="pun">),</span><span class="pln"> length.out </span><span class="pun">=</span><span class="pln"> input</span><span class="pun">$</span><span class="pln">bins </span><span class="pun">+</span><span class="pln"> </span><span class="lit">1</span><span class="pun">)</span><span class="pln">
+      
+      </span><span class="com"># draw the histogram with the specified number of bins</span><span class="pln">
+      hist</span><span class="pun">(</span><span class="pln">x</span><span class="pun">,</span><span class="pln"> breaks </span><span class="pun">=</span><span class="pln"> bins</span><span class="pun">,</span><span class="pln"> col </span><span class="pun">=</span><span class="pln"> </span><span class="str">'darkgray'</span><span class="pun">,</span><span class="pln"> border </span><span class="pun">=</span><span class="pln"> </span><span class="str">'white'</span><span class="pun">)</span><span class="pln">
+   </span><span class="pun">})</span><span class="pln">
+</span><span class="pun">}</span></pre>
+
+</article></slide><slide class="" data-slide-num="19" data-total-slides="32"><hgroup><h2>Running an App</h2></hgroup><article id="running-an-app">
+
+<ul>
+<li>While <code>ui.R</code> or <code>server.R</code> is your active window, click the <strong>Run App</strong> button<br><img src="./RShiny_ Basics and User Interface_files/runAppButton.PNG" title=""></li>
+</ul>
+
+</article></slide><slide class="" data-slide-num="20" data-total-slides="32"><hgroup><h2>Running an App</h2></hgroup><article id="running-an-app-1">
+
+<ul>
+<li><p>While <code>ui.R</code> or <code>server.R</code> is your active window, click the <strong>Run App</strong> button<br><img src="./RShiny_ Basics and User Interface_files/runAppButton.PNG" title=""></p></li>
+<li>Use <code>shiny::runApp()</code> function
+
+<ul>
+<li>ex: <code>runApp("path/to/ui_or_server_or_app.R")</code></li>
+</ul></li>
+</ul>
+
+</article></slide><slide class="" data-slide-num="21" data-total-slides="32"><hgroup><h2>Running an App</h2></hgroup><article id="running-an-app-2">
+
+<ul>
+<li><p>While <code>ui.R</code> or <code>server.R</code> is your active window, click the <strong>Run App</strong> button<br><img src="./RShiny_ Basics and User Interface_files/runAppButton.PNG" title=""></p></li>
+<li>Use <code>shiny::runApp()</code> function
+
+<ul>
+<li>ex: <code>runApp("path/to/ui_or_server_or_app.R")</code></li>
+</ul></li>
+<li>Running App will tie up R console!<br></li>
+<li><p>End by hitting Esc or closing shiny app</p></li>
+</ul>
+
+<ul class="build">
+<li class="to-build">Take a minute and run the template app</li>
+</ul>
+
+</article></slide><slide class="" data-slide-num="22" data-total-slides="32"><hgroup><h2>Adding to the UI</h2></hgroup><article id="adding-to-the-ui">
+
+<p>Using a comma to separate items, you can add</p>
+
+<ul>
+<li>Any plain strings<br></li>
+<li>Widgets<br></li>
+<li>Formatted text (using HTML type functions)<br><img src="./RShiny_ Basics and User Interface_files/tags.PNG" title=""><br></li>
+<li>Output from things created in the <code>server.R</code> file</li>
+</ul>
+
+</article></slide><slide class="" data-slide-num="23" data-total-slides="32"><hgroup><h2>Adding to the UI - Widgets</h2></hgroup><article id="adding-to-the-ui---widgets">
+
+<ul>
+<li>Widgets can be added using their <code>*Input</code> functions<br></li>
+<li>Separate widgets (and other items) by commas in ui.R file</li>
+</ul>
+
+</article></slide><slide class="" data-slide-num="24" data-total-slides="32"><hgroup><h2>Adding to the UI - Widgets</h2></hgroup><article id="adding-to-the-ui---widgets-1">
+
+<ul>
+<li>Widgets can be added using their <code>*Input</code> functions<br></li>
+<li>Separate widgets (and other items) by commas in ui.R file <img src="./RShiny_ Basics and User Interface_files/widgets.PNG" title=""></li>
+</ul>
+
+</article></slide><slide class="" data-slide-num="25" data-total-slides="32"><hgroup><h2></h2></hgroup><article>
+
+<div style="margin-left:-20px; margin-top:-50px; margin-right: -20px; margin-bottom: -50px; height: 100%;">
+<iframe width="100%" height="400" class="shiny-frame" src="./RShiny_ Basics and User Interface_files/saved_resource.html"></iframe></div>
+
+</article></slide><slide class="" data-slide-num="26" data-total-slides="32"><hgroup><h2>HTML tags</h2></hgroup><article id="html-tags">
+
+<p>Adding Formatted Text via HTML</p>
+
+<pre>- Showed tags with helper functions - many more (use `shiny::tags$h1()` for instance)</pre>
+
+<pre class="prettyprint lang-r"><span class="pln">names</span><span class="pun">(</span><span class="pln">shiny</span><span class="pun">::</span><span class="pln">tags</span><span class="pun">)</span></pre>
+
+<pre>##   [1] "a"                   "abbr"                "address"            
+##   [4] "animate"             "animateMotion"       "animateTransform"   
+##   [7] "area"                "article"             "aside"              
+##  [10] "audio"               "b"                   "base"               
+##  [13] "bdi"                 "bdo"                 "blockquote"         
+##  [16] "body"                "br"                  "button"             
+##  [19] "canvas"              "caption"             "circle"             
+##  [22] "cite"                "clipPath"            "code"               
+##  [25] "col"                 "colgroup"            "color-profile"      
+##  [28] "command"             "data"                "datalist"           
+##  [31] "dd"                  "defs"                "del"                
+##  [34] "desc"                "details"             "dfn"                
+##  [37] "dialog"              "discard"             "div"                
+##  [40] "dl"                  "dt"                  "ellipse"            
+##  [43] "em"                  "embed"               "eventsource"        
+##  [46] "feBlend"             "feColorMatrix"       "feComponentTransfer"
+##  [49] "feComposite"         "feConvolveMatrix"    "feDiffuseLighting"  
+##  [52] "feDisplacementMap"   "feDistantLight"      "feDropShadow"       
+##  [55] "feFlood"             "feFuncA"             "feFuncB"            
+##  [58] "feFuncG"             "feFuncR"             "feGaussianBlur"     
+##  [61] "feImage"             "feMerge"             "feMergeNode"        
+##  [64] "feMorphology"        "feOffset"            "fePointLight"       
+##  [67] "feSpecularLighting"  "feSpotLight"         "feTile"             
+##  [70] "feTurbulence"        "fieldset"            "figcaption"         
+##  [73] "figure"              "filter"              "footer"             
+##  [76] "foreignObject"       "form"                "g"                  
+##  [79] "h1"                  "h2"                  "h3"                 
+##  [82] "h4"                  "h5"                  "h6"                 
+##  [85] "hatch"               "hatchpath"           "head"               
+##  [88] "header"              "hgroup"              "hr"                 
+##  [91] "html"                "i"                   "iframe"             
+##  [94] "image"               "img"                 "input"              
+##  [97] "ins"                 "kbd"                 "keygen"             
+## [100] "label"               "legend"              "li"                 
+## [103] "line"                "linearGradient"      "link"               
+## [106] "main"                "map"                 "mark"               
+## [109] "marker"              "mask"                "menu"               
+## [112] "meta"                "metadata"            "meter"              
+## [115] "mpath"               "nav"                 "noscript"           
+## [118] "object"              "ol"                  "optgroup"           
+## [121] "option"              "output"              "p"                  
+## [124] "param"               "path"                "pattern"            
+## [127] "picture"             "polygon"             "polyline"           
+## [130] "pre"                 "progress"            "q"                  
+## [133] "radialGradient"      "rb"                  "rect"               
+## [136] "rp"                  "rt"                  "rtc"                
+## [139] "ruby"                "s"                   "samp"               
+## [142] "script"              "section"             "select"             
+## [145] "set"                 "slot"                "small"              
+## [148] "solidcolor"          "source"              "span"               
+## [151] "stop"                "strong"              "style"              
+## [154] "sub"                 "summary"             "sup"                
+## [157] "svg"                 "switch"              "symbol"             
+## [160] "table"               "tbody"               "td"                 
+## [163] "template"            "text"                "textarea"           
+## [166] "textPath"            "tfoot"               "th"                 
+## [169] "thead"               "time"                "title"              
+## [172] "tr"                  "track"               "tspan"              
+## [175] "u"                   "ul"                  "use"                
+## [178] "var"                 "video"               "view"               
+## [181] "wbr"</pre>
+
+</article></slide><slide class="" data-slide-num="27" data-total-slides="32"><hgroup><h2>Sharing Between Server and UI</h2></hgroup><article id="sharing-between-server-and-ui">
+
+<ul>
+<li><p>Widgets are used to take input from the user</p></li>
+<li><p>Use their values in <code>server.R</code> (has your analysis or vis code!)</p></li>
+<li><p>Functions in <code>server.R</code> will create output to go in the <code>ui.R</code></p></li>
+</ul>
+
+</article></slide><slide class="" data-slide-num="28" data-total-slides="32"><hgroup><h2>Sharing Between Server and UI</h2></hgroup><article id="sharing-between-server-and-ui-1">
+
+<img src="./RShiny_ Basics and User Interface_files/outputsUI.PNG" title="fig:">
+
+</article></slide><slide class="" data-slide-num="29" data-total-slides="32"><hgroup><h2>Adding to the UI - Example Syntax</h2></hgroup><article id="adding-to-the-ui---example-syntax">
+
+<pre class="prettyprint lang-r"><span class="pln">library</span><span class="pun">(</span><span class="pln">shiny</span><span class="pun">)</span><span class="pln">
+ui </span><span class="pun">&lt;-</span><span class="pln"> fluidPage</span><span class="pun">(</span><span class="pln">
+  sidebarLayout</span><span class="pun">(</span><span class="pln">
+    sidebarPanel</span><span class="pun">(</span><span class="pln">
+      h2</span><span class="pun">(</span><span class="str">"Widgets/Text"</span><span class="pun">),</span><span class="pln">
+      numericInput</span><span class="pun">(</span><span class="str">"NI"</span><span class="pun">,</span><span class="pln">label</span><span class="pun">=</span><span class="str">"Intercept"</span><span class="pun">,</span><span class="pln">value</span><span class="pun">=</span><span class="lit">10</span><span class="pun">),</span><span class="pln">
+      sliderInput</span><span class="pun">(</span><span class="str">"SI"</span><span class="pun">,</span><span class="pln">label</span><span class="pun">=</span><span class="str">"Slope"</span><span class="pun">,</span><span class="pln">min</span><span class="pun">=</span><span class="lit">-1</span><span class="pun">,</span><span class="pln">max</span><span class="pun">=</span><span class="lit">1</span><span class="pun">,</span><span class="pln">value</span><span class="pun">=</span><span class="lit">0</span><span class="pun">,</span><span class="pln">step</span><span class="pun">=</span><span class="lit">0.1</span><span class="pun">),</span><span class="pln">
+      </span><span class="str">"More text"</span><span class="pun">,</span><span class="pln">
+      br</span><span class="pun">(),</span><span class="pln">
+      a</span><span class="pun">(</span><span class="pln">href</span><span class="pun">=</span><span class="str">"http://www.rstudio.com"</span><span class="pun">,</span><span class="pln">target</span><span class="pun">=</span><span class="str">"_blank"</span><span class="pun">,</span><span class="str">"Link to RStudio"</span><span class="pun">)</span><span class="pln">
+    </span><span class="pun">),</span><span class="pln">
+    mainPanel</span><span class="pun">(</span><span class="pln">plotOutput</span><span class="pun">(</span><span class="str">"dataPlot"</span><span class="pun">),</span><span class="pln"> </span><span class="com">#dataPlot is name of "plot" object in server</span><span class="pln">
+              textOutput</span><span class="pun">(</span><span class="str">"dataInfo"</span><span class="pun">),</span><span class="pln"> </span><span class="com">#dataInfo is name of "text" object in server</span><span class="pln">
+              dataTableOutput</span><span class="pun">(</span><span class="str">"dataTable"</span><span class="pun">)</span><span class="pln"> </span><span class="com">#dataTable is name of "data" object in server</span><span class="pln">
+    </span><span class="pun">)</span><span class="pln">
+  </span><span class="pun">)</span><span class="pln">
+</span><span class="pun">)</span></pre>
+
+</article></slide><slide class="" data-slide-num="30" data-total-slides="32"><hgroup><h2></h2></hgroup><article>
+
+<iframe width="100%" height="400" class="shiny-frame" src="./RShiny_ Basics and User Interface_files/saved_resource(1).html"></iframe>
+
+</article></slide><slide class="" data-slide-num="31" data-total-slides="32"><hgroup><h2>What is <code>shiny</code> Doing?</h2></hgroup><article id="what-is-shiny-doing">
+
+<p>Shiny is really just writing HTML for us…</p>
+
+<ul>
+<li>Run this code in the console</li>
+</ul>
+
+<pre class="prettyprint lang-r"><span class="pln">library</span><span class="pun">(</span><span class="pln">shiny</span><span class="pun">)</span><span class="pln">  
+sidebarPanel</span><span class="pun">()</span><span class="pln">
+h1</span><span class="pun">(</span><span class="str">"What's up?"</span><span class="pun">)</span><span class="pln">
+p</span><span class="pun">(</span><span class="str">"paragraph"</span><span class="pun">)</span><span class="pln">
+sidebarPanel</span><span class="pun">(</span><span class="pln">h1</span><span class="pun">(</span><span class="str">"What's up?"</span><span class="pun">),</span><span class="pln"> p</span><span class="pun">(</span><span class="str">"paragraph and "</span><span class="pun">,</span><span class="pln"> strong</span><span class="pun">(</span><span class="str">"bold text"</span><span class="pun">)))</span><span class="pln">
+sliderInput</span><span class="pun">(</span><span class="str">"name"</span><span class="pun">,</span><span class="pln"> </span><span class="str">"Title"</span><span class="pun">,</span><span class="pln"> min </span><span class="pun">=</span><span class="pln"> </span><span class="lit">0</span><span class="pun">,</span><span class="pln"> max </span><span class="pun">=</span><span class="pln"> </span><span class="lit">5</span><span class="pun">,</span><span class="pln"> value </span><span class="pun">=</span><span class="pln"> </span><span class="lit">1</span><span class="pun">)</span><span class="pln">
+plotOutput</span><span class="pun">(</span><span class="str">"name"</span><span class="pun">)</span></pre>
+
+</article></slide><slide class="" data-slide-num="32" data-total-slides="32"><hgroup><h2>Summary So Far</h2></hgroup><article id="summary-so-far">
+
+<p><code>ui.r</code></p>
+
+<ul>
+<li><p>Controls layout of app</p></li>
+<li><p>Basic layout uses a sidebar panel and a main panel</p></li>
+<li><p>Use strings, formatted (html style) text, widgets (<code>*Input</code> functions), and output from <code>server.r</code> (<code>*Output</code> functions)</p></li>
+<li><p>Separate items with commas</p></li>
+</ul></article></slide>
+
+
+  <slide class="backdrop"></slide>
+
+<div class="slide-area" id="prev-slide-area"></div><div class="slide-area" id="next-slide-area"></div></slides>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+<!-- map slide visiblity events into shiny -->
+<script>
+  (function() {
+    if (window.jQuery) {
+       window.jQuery(document).on('slideleave', function(e) {
+         window.jQuery(e.target).trigger('hidden');
+      });
+       window.jQuery(document).on('slideenter', function(e) {
+         window.jQuery(e.target).trigger('shown');
+      });
+    }
+  })();
+</script>
+
+
+</div>
+  </div>
+
+
+<div id="ss-connect-dialog" style="display: none;"></div><div id="ss-overlay" class="ss-gray-out" style="display: none;"></div><div aria-live="assertive" role="log" aria-relevant="additions" aria-atomic="true" style="position: absolute; width: 1px; height: 1px; margin-top: -1px; clip: rect(1px, 1px, 1px, 1px); overflow: hidden;"></div></body></html>
